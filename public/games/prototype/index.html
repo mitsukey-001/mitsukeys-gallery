@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>試作ゲーム</title>
+  <link rel="icon" href="TemplateData/favicon.ico">
+  <link rel="stylesheet" href="TemplateData/style.css">
+  <style>
+    html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#1f211d}
+    #unity-container{position:absolute;inset:0;width:100%;height:100%}
+    #unity-canvas{display:block;width:100%;height:100%;background:#1f211d}
+    #unity-loading-bar{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;color:#fff;font-family:sans-serif}
+    #unity-progress-bar-empty{width:180px;height:18px;margin-top:14px;background:#555}
+    #unity-progress-bar-full{width:0;height:100%;background:#e2c85d}
+    #unity-warning{position:absolute;left:1rem;right:1rem;top:1rem;z-index:2}
+  </style>
+</head>
+<body>
+  <div id="unity-container">
+    <canvas id="unity-canvas" tabindex="-1"></canvas>
+    <div id="unity-loading-bar">
+      <div>読み込み中…</div>
+      <div id="unity-progress-bar-empty"><div id="unity-progress-bar-full"></div></div>
+    </div>
+    <div id="unity-warning"></div>
+  </div>
+  <script>
+    const canvas = document.querySelector("#unity-canvas");
+    const loadingBar = document.querySelector("#unity-loading-bar");
+    const progressBarFull = document.querySelector("#unity-progress-bar-full");
+    const warningBanner = document.querySelector("#unity-warning");
+
+    function unityShowBanner(message, type) {
+      const item = document.createElement("div");
+      item.textContent = message;
+      item.style.cssText = "padding:10px;margin-bottom:6px;background:" + (type === "error" ? "#d94135" : "#e8d15f") + ";color:#1f211d";
+      warningBanner.appendChild(item);
+      if (type !== "error") setTimeout(() => item.remove(), 5000);
+    }
+
+    const buildUrl = "Build";
+    const config = {
+      arguments: [],
+      dataUrl: buildUrl + "/ge-mu.data",
+      frameworkUrl: buildUrl + "/ge-mu.framework.js",
+      codeUrl: buildUrl + "/ge-mu.wasm",
+      streamingAssetsUrl: "StreamingAssets",
+      companyName: "Ishinogami Mitsukii",
+      productName: "Prototype",
+      productVersion: "1.0",
+      showBanner: unityShowBanner
+    };
+
+    async function startGame() {
+      if (!("serviceWorker" in navigator)) {
+        unityShowBanner("このゲームの起動にはService Worker対応ブラウザが必要です。", "error");
+        return;
+      }
+      await navigator.serviceWorker.register("sw.js", { scope: "./" });
+      await navigator.serviceWorker.ready;
+      if (!navigator.serviceWorker.controller) {
+        location.reload();
+        return;
+      }
+
+      const script = document.createElement("script");
+      script.src = buildUrl + "/ge-mu.loader.js";
+      script.onload = () => {
+        createUnityInstance(canvas, config, progress => {
+          progressBarFull.style.width = (progress * 100) + "%";
+        }).then(() => {
+          loadingBar.style.display = "none";
+        }).catch(message => {
+          unityShowBanner(message, "error");
+        });
+      };
+      document.body.appendChild(script);
+    }
+
+    startGame().catch(message => unityShowBanner(String(message), "error"));
+  </script>
+</body>
+</html>
