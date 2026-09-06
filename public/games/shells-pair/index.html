@@ -476,7 +476,22 @@
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 10px;
-      margin-bottom: 8px;
+      position: fixed;
+      z-index: 1200;
+      top: 58px;
+      left: 50%;
+      width: min(calc(100vw - 28px), 1252px);
+      max-height: calc(100vh - 76px);
+      margin: 0;
+      padding: 14px;
+      overflow-y: auto;
+      transform: translateX(-50%);
+      border: 1px solid rgba(135, 224, 255, .66);
+      border-radius: 14px;
+      background: rgba(5, 43, 67, .68);
+      box-shadow: 0 18px 48px rgba(0, 15, 29, .38), inset 0 1px rgba(255, 255, 255, .22);
+      backdrop-filter: blur(3px);
+      -webkit-backdrop-filter: blur(3px);
     }
 
     .status-grid.collapsed {
@@ -484,7 +499,7 @@
     }
 
     .player {
-      background: linear-gradient(180deg, #fff8e8, #f2e3c3);
+      background: linear-gradient(180deg, rgba(255, 248, 232, .94), rgba(242, 227, 195, .91));
       border: 1px solid #d4b77d;
       border-radius: 8px;
       padding: 12px;
@@ -956,6 +971,26 @@
       pointer-events: none;
       transform-origin: center center;
       filter: drop-shadow(0 18px 18px rgba(0,0,0,.28));
+    }
+
+    .deal-fly-card {
+      position: fixed;
+      z-index: 125;
+      width: 56px;
+      height: 78px;
+      border: 5px solid #f2d28c;
+      border-radius: 7px;
+      background:
+        linear-gradient(135deg, transparent 44%, rgba(255,255,255,.22) 45% 55%, transparent 56%),
+        repeating-linear-gradient(45deg, #174d87 0 8px, #0d3868 8px 16px);
+      box-shadow: 0 12px 22px rgba(0, 0, 0, .34);
+      pointer-events: none;
+      transform-origin: center;
+    }
+
+    .app.dealing #hand .card,
+    .app.dealing .opponent-seat .seat-card {
+      opacity: 0;
     }
 
     .discard-fly-card .card {
@@ -1457,7 +1492,19 @@
         padding: 6px 8px;
         font-size: 12px;
       }
-      .status-grid { grid-template-columns: 1fr; }
+      .status-grid {
+        top: 52px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 7px;
+        width: calc(100vw - 16px);
+        max-height: calc(100vh - 62px);
+        padding: 8px;
+      }
+      .status-grid .player {
+        min-height: 96px;
+        padding: 9px;
+      }
+      .status-grid .player-stats strong { font-size: 17px; }
       main { gap: 8px; }
       .table { padding: 8px; border-width: 6px; }
       .table::before { inset: 8px; }
@@ -1752,8 +1799,8 @@
           <option value="3">3人</option>
           <option value="4" selected>4人</option>
         </select>
-        <button id="toggleScores" class="secondary">スコアを畳む</button>
-        <button id="newGame">新しく始める</button>
+        <button id="toggleScores" class="secondary">スコアを表示する</button>
+        <button id="newGame" class="danger">ゲームをやめる</button>
       </div>
     </header>
 
@@ -1887,6 +1934,7 @@
 
     function showSplashScreen() {
       stopGameBgm();
+      clearDealAnimation();
       clearCpuTimer();
       clearCutinTimer();
       clearPairNoticeTimer();
@@ -1900,6 +1948,7 @@
 
     function showStartScreen() {
       stopGameBgm();
+      clearDealAnimation();
       clearCpuTimer();
       clearCutinTimer();
       clearPairNoticeTimer();
@@ -1961,6 +2010,7 @@
     }
 
     function startTutorial() {
+      clearDealAnimation();
       clearCpuTimer();
       clearCutinTimer();
       clearPairNoticeTimer();
@@ -2161,6 +2211,7 @@
     }
 
     function newGame() {
+      clearDealAnimation();
       clearCpuTimer();
       clearCutinTimer();
       clearPairNoticeTimer();
@@ -2201,12 +2252,82 @@
         cutinTimer: null,
         scoresCollapsed: true,
         cpuTimer: null,
+        dealing: true,
+        dealTimers: [],
+        dealAnimations: [],
         gameOver: false,
         finishOrder: [],
         log: [`ゲーム開始。最初の捨て札は「${firstDiscard.name}」。`]
       };
       render();
-      queueCutinClear(1100);
+      queueCutinClear(850, playInitialDealAnimation);
+    }
+
+    function clearDealAnimation() {
+      if (state?.dealTimers) state.dealTimers.forEach(timer => clearTimeout(timer));
+      if (state?.dealAnimations) state.dealAnimations.forEach(animation => animation.cancel());
+      document.querySelectorAll(".deal-fly-card").forEach(card => card.remove());
+      if (state) {
+        state.dealTimers = [];
+        state.dealAnimations = [];
+        state.dealing = false;
+      }
+      $("gameApp")?.classList.remove("dealing");
+    }
+
+    function playInitialDealAnimation() {
+      if (!state || state.gameOver || !state.dealing) return;
+      const order = [];
+      for (let round = 0; round < 5; round++) {
+        for (let playerIndex = 0; playerIndex < state.players.length; playerIndex++) {
+          order.push(playerIndex);
+        }
+      }
+      let completed = 0;
+      order.forEach((playerIndex, index) => {
+        const timer = setTimeout(() => {
+          if (!state?.dealing) return;
+          animateInitialDealCard(playerIndex, () => {
+            completed++;
+            if (completed !== order.length || !state?.dealing) return;
+            state.dealing = false;
+            state.dealTimers = [];
+            state.dealAnimations = [];
+            state.log.unshift("各プレイヤーへカードを5枚ずつ配りました。");
+            render();
+          });
+        }, index * 82);
+        state.dealTimers.push(timer);
+      });
+    }
+
+    function animateInitialDealCard(playerIndex, after) {
+      const source = $("deckPile")?.getBoundingClientRect();
+      const targetElement = playerIndex === 0
+        ? $("hand")
+        : document.querySelector(`.opponent-seat[data-player-index="${playerIndex}"]`);
+      const target = targetElement?.getBoundingClientRect();
+      if (!source || !target) {
+        after();
+        return;
+      }
+      const card = document.createElement("div");
+      card.className = "deal-fly-card";
+      card.style.left = `${source.left + source.width / 2 - 28}px`;
+      card.style.top = `${source.top + source.height / 2 - 39}px`;
+      document.body.appendChild(card);
+      const dx = target.left + target.width / 2 - (source.left + source.width / 2);
+      const dy = target.top + target.height / 2 - (source.top + source.height / 2);
+      const animation = card.animate([
+        { transform: "translate(0, 0) rotate(-8deg) scale(.72)", opacity: .96 },
+        { transform: `translate(${dx * .55}px, ${dy * .45 - 35}px) rotate(7deg) scale(1)`, opacity: 1, offset: .55 },
+        { transform: `translate(${dx}px, ${dy}px) rotate(${playerIndex % 2 ? 9 : -5}deg) scale(.72)`, opacity: .35 }
+      ], { duration: 390, easing: "cubic-bezier(.2,.72,.28,1)", fill: "forwards" });
+      state.dealAnimations.push(animation);
+      animation.finished.then(() => {
+        card.remove();
+        after();
+      }).catch(() => card.remove());
     }
 
     function currentPlayer() { return state.players[state.current]; }
@@ -2293,7 +2414,7 @@
     }
 
     function scheduleAutomation() {
-      if (!state || state.gameOver || state.cpuTimer || state.cutin) return;
+      if (!state || state.gameOver || state.dealing || state.cpuTimer || state.cutin) return;
       if (state.tutorial?.enabled) return;
       if (!isHumanTurn() && state.phase === "draw") {
         state.cpuTimer = setTimeout(() => {
@@ -3022,6 +3143,7 @@
 
     function render() {
       if (!state) return;
+      $("gameApp").classList.toggle("dealing", !!state.dealing);
       renderCutin();
       renderPlayers();
       renderOpponentRail();
@@ -3233,18 +3355,19 @@
     function renderButtons() {
       const p = currentPlayer();
       const human = isHumanTurn();
+      const locked = !!state.dealing;
       const cards = selectedCards();
       const validHandPair = cards.length === 2 && canPair(cards[0], cards[1]);
       const validEvent = cards.length === 1 && cards[0].type === "event";
       const validDiscard = cards.length === 1;
       const discardOptions = state.phase === "discardPair" ? discardPairOptions() : [];
       const cpuHasDiscardPriority = discardOptions.length && !isHumanIndex(discardOptions[0].playerIndex);
-      $("toggleScores").textContent = state.scoresCollapsed ? "スコアを開く" : "スコアをしまう";
-      $("drawBtn").disabled = !human || state.phase !== "draw" || p.out || state.gameOver;
-      $("pairBtn").disabled = !human || state.phase !== "afterDraw" || !validHandPair || state.gameOver;
-      $("eventBtn").disabled = !human || state.phase !== "afterDraw" || !validEvent || state.eventUsed || state.gameOver;
-      $("discardBtn").disabled = !human || state.phase !== "afterDraw" || !validDiscard || state.gameOver;
-      $("skipDiscardPairBtn").disabled = state.phase !== "discardPair" || state.gameOver || cpuHasDiscardPriority;
+      $("toggleScores").textContent = state.scoresCollapsed ? "スコアを表示する" : "スコアを閉じる";
+      $("drawBtn").disabled = locked || !human || state.phase !== "draw" || p.out || state.gameOver;
+      $("pairBtn").disabled = locked || !human || state.phase !== "afterDraw" || !validHandPair || state.gameOver;
+      $("eventBtn").disabled = locked || !human || state.phase !== "afterDraw" || !validEvent || state.eventUsed || state.gameOver;
+      $("discardBtn").disabled = locked || !human || state.phase !== "afterDraw" || !validDiscard || state.gameOver;
+      $("skipDiscardPairBtn").disabled = locked || state.phase !== "discardPair" || state.gameOver || cpuHasDiscardPriority;
       if (state.tutorial?.enabled) {
         const step = state.tutorial.step;
         $("drawBtn").disabled = !(["handDraw", "specialDraw", "eventDraw"].includes(step) && state.phase === "draw");
@@ -3253,6 +3376,17 @@
         $("discardBtn").disabled = true;
         $("skipDiscardPairBtn").disabled = true;
       }
+    }
+
+    function confirmQuitGame() {
+      showModal(
+        "ゲームをやめますか？",
+        "<p>現在のゲーム進行は失われます。ゲームモード選択画面へ戻りますか？</p>",
+        [
+          { label: "ゲームをやめる", className: "danger", action: showStartScreen },
+          { label: "ゲームを続ける", className: "secondary", action: () => closeModal({ stayOnCurrentScreen: true }) }
+        ]
+      );
     }
 
     function showModal(title, body, actions) {
@@ -3370,7 +3504,7 @@
       bgm.currentTime = 0;
     }
 
-    $("newGame").addEventListener("click", newGame);
+    $("newGame").addEventListener("click", confirmQuitGame);
     $("toggleScores").addEventListener("click", () => {
       if (!state) return;
       state.scoresCollapsed = !state.scoresCollapsed;
@@ -3399,3 +3533,4 @@
   </script>
 </body>
 </html>
+
