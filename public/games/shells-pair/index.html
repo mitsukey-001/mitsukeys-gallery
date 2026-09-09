@@ -312,7 +312,7 @@
 
     .start-facts {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 8px;
     }
 
@@ -331,6 +331,32 @@
       color: var(--ink);
       font-size: 18px;
       line-height: 1.2;
+    }
+
+    .card-kind-tab {
+      text-align: left;
+      cursor: pointer;
+    }
+    .card-kind-tab[aria-selected="true"] {
+      background: #dff5ff;
+      border-color: #2b9ac7;
+      box-shadow: 0 0 0 2px rgba(43, 154, 199, .3);
+    }
+    .card-kind-tab:focus-visible {
+      outline: 3px solid #2b9ac7;
+      outline-offset: 3px;
+    }
+    .card-kind-panel {
+      padding: 14px;
+      border: 1px solid #91cde2;
+      border-radius: 10px;
+      background: #f1fbff;
+      color: var(--ink);
+    }
+    .card-kind-panel h2 { margin: 0 0 8px; font-size: 18px; }
+    .card-kind-panel p { margin: 0 0 12px; font-size: 13px; }
+    @media (max-width: 560px) {
+      .card-kind-panel .card-list { grid-template-columns: 1fr; }
     }
 
     .start-rules {
@@ -993,6 +1019,12 @@
       opacity: 0;
     }
 
+    .app.awaiting-tutorial-deal #hand .card,
+    .app.awaiting-tutorial-deal .opponent-seat .seat-card,
+    .app.awaiting-tutorial-deal #discardArea .card {
+      visibility: hidden;
+    }
+
     .discard-fly-card .card {
       width: 100%;
       height: 100%;
@@ -1390,6 +1422,30 @@
       cursor: pointer;
     }
 
+    .tutorial-target {
+      outline: 3px solid #8cecff !important;
+      outline-offset: 3px;
+      animation: tutorialTargetPulse 1.1s ease-in-out infinite !important;
+    }
+
+    @keyframes tutorialTargetPulse {
+      0%, 100% {
+        outline-color: #b6f4ff;
+        box-shadow: 0 0 0 4px rgba(66, 195, 255, .22), 0 0 12px rgba(69, 211, 255, .45);
+      }
+      50% {
+        outline-color: #25bfff;
+        box-shadow: 0 0 0 7px rgba(66, 195, 255, .5), 0 0 28px rgba(69, 211, 255, .95);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .tutorial-target {
+        animation: none !important;
+        box-shadow: 0 0 0 4px rgba(66, 195, 255, .5) !important;
+      }
+    }
+
     .tutorial-skip {
       position: fixed;
       top: max(18px, env(safe-area-inset-top));
@@ -1714,11 +1770,13 @@
         <button id="startGame" class="start-button">ゲーム開始</button>
         <button id="startTutorial" class="tutorial-button">チュートリアル</button>
       </div>
-      <div class="start-facts">
-        <div class="start-fact"><strong>10分程度</strong>短時間で遊べます</div>
-        <div class="start-fact"><strong>CPU対戦</strong>P2以降は自動操作</div>
-        <div class="start-fact"><strong>チップ勝負</strong>最多チップで勝利</div>
+      <div class="start-fact"><strong>CPU対戦</strong>P2以降は自動操作</div>
+      <div class="start-facts" role="tablist" aria-label="カードの種類">
+        <button id="specialCardsTab" class="start-fact card-kind-tab" type="button" role="tab" aria-selected="false" aria-controls="specialCardsPanel"><strong>特殊ペアカードの種類</strong>タップ／クリックで3種類を確認</button>
+        <button id="eventCardsTab" class="start-fact card-kind-tab" type="button" role="tab" aria-selected="false" aria-controls="eventCardsPanel"><strong>イベントカードの種類</strong>タップ／クリックで6種類を確認</button>
       </div>
+      <section id="specialCardsPanel" class="card-kind-panel hidden" role="tabpanel" aria-labelledby="specialCardsTab" tabindex="0"></section>
+      <section id="eventCardsPanel" class="card-kind-panel hidden" role="tabpanel" aria-labelledby="eventCardsTab" tabindex="0"></section>
       <details class="start-rules">
         <summary>ルール説明</summary>
         <div class="rule-body">
@@ -1742,11 +1800,11 @@
             <h2>通常カード</h2>
             <div>同じ絵柄を2枚そろえると、星の数だけチップを獲得します。</div>
             <div class="card-list">
-              <div class="card-rule"><strong>星1</strong>2枚貝、巻貝</div>
-              <div class="card-rule"><strong>星2</strong>銅貨、麦</div>
-              <div class="card-rule"><strong>星3</strong>銀貨、胡椒</div>
-              <div class="card-rule"><strong>星4</strong>金貨、真珠</div>
-              <div class="card-rule"><strong>星5</strong>ダイヤ</div>
+              <div class="card-rule"><strong>星1</strong>2枚貝×6枚、巻貝×6枚</div>
+              <div class="card-rule"><strong>星2</strong>銅貨×5枚、麦×5枚</div>
+              <div class="card-rule"><strong>星3</strong>銀貨×4枚、胡椒×4枚</div>
+              <div class="card-rule"><strong>星4</strong>金貨×4枚、真珠×4枚</div>
+              <div class="card-rule"><strong>星5</strong>ダイヤ×3枚</div>
             </div>
           </section>
 
@@ -1754,9 +1812,9 @@
             <h2>特殊ペアカード</h2>
             <div>通常カードとしても扱いますが、指定された別カードともペアを作れます。特殊ペアの得点は組み合わせごとに決まっています。</div>
             <div class="card-list">
-              <div class="card-rule"><strong>真珠貝</strong>真珠とペア。チップ3枚。</div>
-              <div class="card-rule"><strong>肉</strong>胡椒とペア。チップ3枚。</div>
-              <div class="card-rule"><strong>宝箱</strong>星2以下のカードとペア。チップ2枚。</div>
+              <div class="card-rule"><strong>真珠貝×4枚</strong>真珠とペア。チップ3枚。</div>
+              <div class="card-rule"><strong>肉×3枚</strong>胡椒とペア。チップ3枚。</div>
+              <div class="card-rule"><strong>宝箱×2枚</strong>星2以下のカードとペア。チップ2枚。</div>
             </div>
           </section>
 
@@ -1764,12 +1822,12 @@
             <h2>イベントカード</h2>
             <div>自分のターン中、カードを捨てる代わりに公開して効果を使えます。イベントカードではペア宣言できません。</div>
             <div class="card-list">
-              <div class="card-rule"><strong>再探査</strong>もう一度自分のターンを行う。</div>
-              <div class="card-rule"><strong>破棄</strong>手札を1枚捨てる。そのカードはペア宣言できない。</div>
-              <div class="card-rule"><strong>貝塚</strong>手札を1枚捨てる。そのカードはペア宣言できず、星1ならチップを2枚獲得する。</div>
-              <div class="card-rule"><strong>交換会</strong>全員が手札を1枚選び、左隣のプレイヤーに渡す。</div>
-              <div class="card-rule"><strong>事故</strong>プレイヤーを1人選び、手札を見ないで1枚捨てる。そのカードはペア宣言できる。その後、選ばれたプレイヤーは山札から1枚引く。</div>
-              <div class="card-rule"><strong>鮫交換</strong>プレイヤーを1人選ぶ。自分の手札1枚と、そのプレイヤーの手札を見ないで選んだ1枚を交換する。</div>
+              <div class="card-rule"><strong>再探査×2枚</strong>もう一度自分のターンを行う。</div>
+              <div class="card-rule"><strong>破棄×2枚</strong>手札を1枚捨てる。そのカードはペア宣言できない。</div>
+              <div class="card-rule"><strong>貝塚×2枚</strong>手札を1枚捨てる。そのカードはペア宣言できず、星1ならチップを2枚獲得する。</div>
+              <div class="card-rule"><strong>交換会×2枚</strong>全員が手札を1枚選び、左隣のプレイヤーに渡す。</div>
+              <div class="card-rule"><strong>事故×2枚</strong>プレイヤーを1人選び、手札を見ないで1枚捨てる。そのカードはペア宣言できる。その後、選ばれたプレイヤーは山札から1枚引く。</div>
+              <div class="card-rule"><strong>鮫交換×2枚</strong>プレイヤーを1人選ぶ。自分の手札1枚と、そのプレイヤーの手札を見ないで選んだ1枚を交換する。</div>
             </div>
           </section>
 
@@ -1992,14 +2050,17 @@
     }
 
     function showTutorialMessage(text, next = null) {
+      clearCpuTimer();
       tutorialAdvance = next;
       $("tutorialText").textContent = text;
       $("tutorialOverlay").classList.remove("hidden");
+      renderTutorialGuidance();
     }
 
     function hideTutorialMessage() {
       $("tutorialOverlay").classList.add("hidden");
       tutorialAdvance = null;
+      renderTutorialGuidance();
     }
 
     function advanceTutorialMessage() {
@@ -2007,6 +2068,38 @@
       const next = tutorialAdvance;
       hideTutorialMessage();
       if (next) next();
+      scheduleAutomation();
+    }
+
+    function showTutorialIntro() {
+      const pages = [
+        "ようこそ、チュートリアルへ。ここでは『シェルズペア』の遊び方を学んでいきましょう。",
+        "このゲームは、同じ種類のカードをそろえて「ペア」を成立させ、ペアに応じたチップを獲得するカードゲームです。",
+        "ゲーム終了時に、獲得したチップの枚数によって順位が決まります。より多くのチップを獲得できるように立ち回りましょう。",
+        "獲得できるチップが少ないカードほど山札に多く入っているため、ペアを成立させやすくなっています。反対に、獲得できるチップが多いカードは枚数が少なく、ペアを成立させるのが難しくなっています。",
+        "それでは、実際にプレイしながらゲームの流れを確認していきましょう。あなたはP1、P2・P3はCPUです。5回の自分の手番を通して、基本操作からイベント、勝負宣言、上がりまで練習します。"
+      ];
+      const showPage = index => {
+        if (index < pages.length - 1) {
+          showTutorialMessage(pages[index], () => showPage(index + 1));
+          return;
+        }
+        showTutorialMessage(pages[index], () => {
+          state.awaitingTutorialDeal = false;
+          state.dealing = true;
+          state.dealTimers = [];
+          state.dealAnimations = [];
+          state.initialDiscardPlaced = false;
+          state.initialDiscardFaceDownUid = state.discard[0]?.uid || null;
+          render();
+          animateInitialDiscard(() => playInitialDealAnimation(() => {
+            state.tutorial.step = "firstDraw";
+            render();
+            showTutorialMessage("1ターン目・基本操作：カードを引く。自分の手番は、まず「カードを引く」から始まります。説明を閉じて、光っているボタンを押しましょう。");
+          }));
+        });
+      };
+      showPage(0);
     }
 
     function startTutorial() {
@@ -2028,16 +2121,16 @@
         skip: false
       }));
       players[0].hand = makeTutorialHand([
-        ["bivalve", "normal", "p1-start-pair"],
+        ["spiral", "normal", "p1-start-pair"],
         ["gold", "normal", "p1-start-gold"],
         ["pepper", "normal", "p1-start-pepper"],
-        ["wheat", "normal", "p1-start-wheat"],
-        ["copper", "normal", "p1-start-copper"]
+        ["pearl_oyster", "special", "p1-start-special"],
+        ["diamond", "normal", "p1-start-diamond"]
       ]);
       players[1].hand = makeTutorialHand([
         ["gold", "normal", "p2-gold"],
         ["silver", "normal", "p2-silver"],
-        ["wheat", "normal", "p2-wheat"],
+        ["pepper", "normal", "p2-pepper"],
         ["meat", "special", "p2-meat"],
         ["diamond", "normal", "p2-diamond"]
       ]);
@@ -2045,14 +2138,14 @@
         ["spiral", "normal", "p3-spiral"],
         ["copper", "normal", "p3-copper"],
         ["pearl", "normal", "p3-pearl"],
-        ["treasure", "special", "p3-treasure"],
-        ["silver", "normal", "p3-silver"]
+        ["gold", "normal", "p3-gold"],
+        ["bivalve", "normal", "p3-bivalve"]
       ]);
       state = {
-        deck: [
-          makeFixedCard("diamond", "normal", "deck-filler"),
-          makeFixedCard("bivalve", "normal", "deck-hand-pair")
-        ],
+        deck: ["wheat", "bivalve", "silver", "gold", "copper", "gold",
+          "accident", "silver", "bivalve", "silver", "wheat", "bivalve", "silver",
+          "diamond", "copper"].map((id, i) =>
+            makeFixedCard(id, id === "accident" ? "event" : "normal", "lesson-" + i)).reverse(),
         discard: [makeFixedCard("copper", "normal", "first-discard")],
         bank: 80,
         players,
@@ -2073,14 +2166,11 @@
         gameOver: false,
         finishOrder: [],
         log: ["チュートリアルを開始しました。"],
-        tutorial: { enabled: true, step: "welcome" }
+        tutorial: { enabled: true, step: "welcome", turn: 1 },
+        awaitingTutorialDeal: true
       };
       render();
-      showTutorialMessage("ようこそ、シェルジペアへ。ここでの遊び方を学んでいきましょう。", () => {
-        state.tutorial.step = "handDraw";
-        render();
-        showTutorialMessage("まずは自分の手札内でのペア宣言です。「カードを引く」を押して、同じ絵柄のカードをそろえましょう。");
-      });
+      showTutorialIntro();
     }
 
     function goToGameModeSelection() {
@@ -2095,110 +2185,71 @@
     }
 
     function tutorialAfterDraw() {
-      if (!state?.tutorial?.enabled) return;
-      if (state.tutorial.step === "handDraw") {
+      if (!state?.tutorial?.enabled || !isHumanTurn()) return;
+      if (state.tutorial.step === "firstDraw") {
+        state.tutorial.step = "firstDiscard";
+        showTutorialMessage("1ターン目・カードを捨てる\n手札から「麦」を1枚選び、「捨てる」を押しましょう。カードを引いた後、ペアを作らない場合は1枚捨てて手番を終えます。");
+      } else if (state.tutorial.step === "secondDraw") {
         state.tutorial.step = "handPair";
-        showTutorialMessage("同じ絵柄のカードが2枚そろいました。2枚を選んで「手札でペア」を押すと、チップを獲得できます。");
-        return;
-      }
-      if (state.tutorial.step === "specialDraw") {
-        state.tutorial.step = "specialPair";
-        showTutorialMessage("真珠を引きました。真珠貝は同じ絵柄でなくても真珠とペアにできます。2枚を選んで「手札でペア」を押しましょう。");
-        return;
-      }
-      if (state.tutorial.step === "eventDraw") {
+        showTutorialMessage("2ターン目・手札のペア\n金貨が2枚そろいました。2枚を選んで「手札でペア」を押しましょう。ペアを出すとチップを獲得し、手番が終わります。");
+      } else if (state.tutorial.step === "thirdDraw") {
         state.tutorial.step = "eventUse";
-        showTutorialMessage("イベントカードを引きました。イベントカードを選んで「イベント使用」を押してください。その後、効果で捨てるカードを選びます。");
+        showTutorialMessage("3ターン目・イベントカード「事故」\n事故は相手の手札を見ずに1枚捨てさせ、その相手が1枚引くイベントです。捨てられたカードにはペア宣言できます。「事故」を選んで「イベント使用」を押し、P2を選びましょう。");
+      } else if (state.tutorial.step === "fourthDraw") {
+        state.tutorial.step = "fourthDiscard";
+        showTutorialMessage("今回は麦を引きました。ダイヤとはペアにできません。「麦」を選んで捨て、ダイヤを最後の1枚として残しましょう。勝負の判定は次の自分の手番終了時まで続きます。");
+      } else if (state.tutorial.step === "fifthDraw") {
+        state.tutorial.step = "finishPair";
+        showTutorialMessage("5ターン目・上がり\nダイヤを引いて、最後の手札とペアになりました。ダイヤ2枚を選んで「手札でペア」を押しましょう！");
       }
+      renderButtons();
     }
 
     function tutorialAfterHandPair() {
-      if (!state?.tutorial?.enabled) return false;
-      if (state.tutorial.step === "handPair") {
-        state.tutorial.step = "discardPair";
-        state.selected = [];
-        state.current = 2;
-        state.phase = "discardPair";
-        state.players[0].out = false;
-        state.players[0].rank = null;
-        state.finishOrder = [];
-        const discarded = makeFixedCard("spiral", "normal", "tutorial-discard");
-        state.players[0].hand = makeTutorialHand([
-          ["spiral", "normal", "p1-discard-pair"],
-          ["gold", "normal", "p1-after-hand-gold"],
-          ["pepper", "normal", "p1-after-hand-pepper"],
-          ["wheat", "normal", "p1-after-hand-wheat"]
-        ]);
-        state.discard.push(discarded);
-        state.pendingDiscard = { card: discarded, discarder: 2, priorityFrom: 0 };
+      if (state?.tutorial?.enabled && state.tutorial.step === "finishPair") {
+        state.tutorial.step = "closing";
         render();
-        showTutorialMessage("次は他プレイヤーの捨て札へのペア宣言です。捨て札と同じカードが自分の手札にある時は、表示されたペア宣言ボタンを押せます。");
+        showTutorialMessage("上がりおめでとうございます！ 手札が0枚になりました。ダイヤのペアで5枚、1番上がりのボーナスで3枚を獲得しました。上がりボーナスは1番目3枚、2番目2枚、3番目1枚です。", () => {
+          showTutorialMessage("勝負にも成功！ 賭けた1枚が戻り、さらに3枚獲得しました。これでチュートリアルは終了です。タップするとゲームモード選択へ戻ります。", completeTutorial);
+        });
         return true;
       }
-      if (state.tutorial.step === "specialPair") {
-        state.tutorial.step = "eventDraw";
-        state.selected = [];
-        state.current = 0;
-        state.phase = "draw";
-        state.eventUsed = false;
-        state.players[0].out = false;
-        state.players[0].rank = null;
-        state.finishOrder = [];
-        state.players[0].hand = makeTutorialHand([
-          ["bivalve", "normal", "p1-event-bivalve"],
-          ["copper", "normal", "p1-event-copper"],
-          ["gold", "normal", "p1-event-gold"],
-          ["pepper", "normal", "p1-event-pepper"],
-          ["wheat", "normal", "p1-event-target"]
-        ]);
-        state.deck.push(makeFixedCard("shell_mound", "event", "deck-event"));
-        render();
-        showTutorialMessage("最後はイベントカードです。通常の手番と同じように、まず「カードを引く」を押してください。");
-        return true;
-      }
-      return false;
+      if (!state?.tutorial?.enabled || state.tutorial.step !== "handPair") return false;
+      state.tutorial.step = "score";
+      render();
+        showTutorialMessage("2ターン目・レアリティとチップ\n通常ペアは星1なら1枚、星2なら2枚…星5なら5枚のチップを獲得します。今回の金貨は星4なので4枚。特殊ペアは別ルールで、真珠貝＋真珠と肉＋胡椒は3枚、宝箱のペアは2枚です。", () => {
+          showTutorialMessage("「スコアを表示する」を開いて合計5枚を確認しましょう。「スコアを閉じる」を押すと相手の手番に進み、捨て札で特殊ペアを練習します。");
+        });
+      return true;
     }
 
     function tutorialAfterDiscardPair() {
+      if (state?.tutorial?.enabled && state.tutorial.step === "specialDiscardPair") {
+        state.tutorial.step = "watch";
+        showTutorialMessage("真珠貝＋真珠の特殊ペアが成立し、チップを3枚獲得しました。同じ絵柄でなくても、指定の組み合わせでペアを作れます。", nextTurn);
+        return true;
+      }
+      if (state?.tutorial?.enabled && state.tutorial.step === "accidentPair") {
+        state.tutorial.step = "watch";
+        showTutorialMessage("事故で出た胡椒とのペアが成立しました。手札はダイヤ1枚になりました！ このあとCPUの手番が終わると、勝負宣言を練習します。", nextTurn);
+        return true;
+      }
       if (!state?.tutorial?.enabled || state.tutorial.step !== "discardPair") return false;
-      state.tutorial.step = "specialDraw";
-      state.selected = [];
-      state.current = 0;
-      state.phase = "draw";
-      state.pendingDiscard = null;
-      state.players[0].out = false;
-      state.players[0].rank = null;
-      state.finishOrder = [];
-      state.players[0].hand = makeTutorialHand([
-        ["pearl_oyster", "special", "p1-special"],
-        ["gold", "normal", "p1-special-gold"],
-        ["pepper", "normal", "p1-special-pepper"],
-        ["wheat", "normal", "p1-special-wheat"],
-        ["copper", "normal", "p1-special-copper"]
-      ]);
-      state.deck.push(makeFixedCard("pearl", "normal", "deck-special-pearl"));
-      render();
-      showTutorialMessage("次は特殊ペアです。通常の手番と同じように、まず「カードを引く」を押してください。");
+      state.tutorial.step = "secondDraw";
+      nextTurn();
+      showTutorialMessage("2ターン目・自身の手札でペア\n捨て札とのペアが成立し、チップを1枚獲得しました。自分の手番が戻ってきたので、まず「カードを引く」を押しましょう。");
       return true;
     }
 
     function showTutorialClosingMessage() {
       if (!state?.tutorial?.enabled) return false;
       state.tutorial.step = "closing";
-      render();
-      showTutorialMessage("お疲れ様です。これで教えることは全部です。\nこれらの要素を使って誰よりも多くチップを稼いで勝利を目指しましょう。", completeTutorial);
+      showTutorialMessage("基本操作とペア、チップの確認ができました！ チュートリアルはこれで終了です。タップするとゲームモード選択へ戻ります。", completeTutorial);
       return true;
     }
 
     function completeTutorial() {
-      if (!state?.tutorial?.enabled) return false;
-      state.tutorial.step = "complete";
-      state.gameOver = true;
-      state.phase = "gameOver";
-      render();
-      showCutin("ゲームオーバー", "チュートリアル終了", "gameover", 950, () => {
-        showTutorialMessage("これでチュートリアルは終了です。画面をタップするとゲームモード選択へ進みます。", goToGameModeSelection);
-      });
+      goToGameModeSelection();
       return true;
     }
 
@@ -2255,15 +2306,22 @@
         dealing: true,
         dealTimers: [],
         dealAnimations: [],
+        initialDiscardPlaced: false,
+        initialDiscardFaceDownUid: firstDiscard.uid,
         gameOver: false,
         finishOrder: [],
-        log: [`ゲーム開始。最初の捨て札は「${firstDiscard.name}」。`]
+        log: ["ゲーム開始。山札の一番上を裏向きで捨て札に置きました。"]
       };
       render();
-      queueCutinClear(850, playInitialDealAnimation);
+      queueCutinClear(850, () => animateInitialDiscard(playInitialDealAnimation));
     }
 
     function clearDealAnimation() {
+      if (state?.discardAnimation) state.discardAnimation.cancel();
+      if (state) {
+        state.discardAnimation = null;
+        state.discardAnimating = false;
+      }
       if (state?.dealTimers) state.dealTimers.forEach(timer => clearTimeout(timer));
       if (state?.dealAnimations) state.dealAnimations.forEach(animation => animation.cancel());
       document.querySelectorAll(".deal-fly-card").forEach(card => card.remove());
@@ -2275,7 +2333,7 @@
       $("gameApp")?.classList.remove("dealing");
     }
 
-    function playInitialDealAnimation() {
+    function playInitialDealAnimation(after = null) {
       if (!state || state.gameOver || !state.dealing) return;
       const order = [];
       for (let round = 0; round < 5; round++) {
@@ -2293,12 +2351,43 @@
             state.dealing = false;
             state.dealTimers = [];
             state.dealAnimations = [];
-            state.log.unshift("各プレイヤーへカードを5枚ずつ配りました。");
-            render();
+             state.log.unshift("各プレイヤーへカードを5枚ずつ配りました。");
+             render();
+             if (after) after();
           });
         }, index * 82);
         state.dealTimers.push(timer);
       });
+    }
+
+    function animateInitialDiscard(after = null) {
+      if (!state || state.gameOver || !state.dealing) return;
+      const complete = () => {
+        if (!state?.dealing) return;
+        state.initialDiscardPlaced = true;
+        render();
+        if (after) after();
+      };
+      const source = $("deckPile")?.getBoundingClientRect();
+      const target = $("discardArea")?.getBoundingClientRect();
+      if (!source || !target || !source.width || !target.width) return complete();
+      const card = document.createElement("div");
+      card.className = "deal-fly-card";
+      card.style.left = `${source.left + source.width / 2 - 28}px`;
+      card.style.top = `${source.top + source.height / 2 - 39}px`;
+      document.body.appendChild(card);
+      const dx = target.left + target.width / 2 - (source.left + source.width / 2);
+      const dy = target.top + target.height / 2 - (source.top + source.height / 2);
+      const animation = card.animate([
+        { transform: "translate(0, 0) rotate(-7deg) scale(.8)", opacity: 1 },
+        { transform: `translate(${dx * .5}px, ${dy * .42 - 35}px) rotate(8deg) scale(1)`, opacity: 1, offset: .5 },
+        { transform: `translate(${dx}px, ${dy}px) rotate(0deg) scale(1.12)`, opacity: .96 }
+      ], { duration: 620, easing: "cubic-bezier(.2,.72,.28,1)", fill: "forwards" });
+      state.dealAnimations.push(animation);
+      animation.finished.then(() => {
+        card.remove();
+        complete();
+      }).catch(() => card.remove());
     }
 
     function animateInitialDealCard(playerIndex, after) {
@@ -2414,8 +2503,8 @@
     }
 
     function scheduleAutomation() {
-      if (!state || state.gameOver || state.dealing || state.cpuTimer || state.cutin) return;
-      if (state.tutorial?.enabled) return;
+      if (!state || state.gameOver || state.dealing || state.discardAnimating || state.cpuTimer || state.cutin) return;
+      if (state.tutorial?.enabled && (!$("tutorialOverlay").classList.contains("hidden") || ["noPair", "discardPair", "specialDiscardPair", "accidentPair", "score", "scoreViewed", "closing", "eventChoice"].includes(state.tutorial.step))) return;
       if (!isHumanTurn() && state.phase === "draw") {
         state.cpuTimer = setTimeout(() => {
           state.cpuTimer = null;
@@ -2497,6 +2586,12 @@
         return;
       }
       if (state.phase === "afterDraw") {
+        if (state.tutorial?.enabled) {
+          const discards = {1: ["silver", "spiral"], 2: ["bivalve", "pearl"], 3: ["silver", "copper"], 4: ["bivalve", "bivalve"]};
+          const id = discards[state.tutorial.turn][state.current - 1];
+          discardCardDirect(player.hand.find(card => card.id === id));
+          return;
+        }
         const pair = findBestPair(player.hand);
         if (pair) {
           claimPair(player, pair.a, pair.b, "手札");
@@ -2509,7 +2604,22 @@
     }
 
     function discardCardDirect(card, options = {}) {
-      if (state.phase !== "afterDraw" || !card) return;
+      if (state.phase !== "afterDraw" || !card || state.discardAnimating) return;
+      if (!options.skipAnimation && !isHumanIndex(state.current)) {
+        const game = state;
+        state.discardAnimating = true;
+        const animation = animateCardToDiscard(card, state.current, () => {
+          if (state !== game) return;
+          state.discardAnimating = false;
+          state.discardAnimation = null;
+          discardCardDirect(card, { skipAnimation: true });
+        });
+        if (animation) {
+          state.discardAnimation = animation;
+          return;
+        }
+        state.discardAnimating = false;
+      }
       const player = currentPlayer();
       if (!options.skipAnimation) animateCardToDiscard(card, state.current);
       removeFromHand(player, card);
@@ -2519,8 +2629,20 @@
       state.phase = "discardPair";
       state.selected = [];
       state.log.unshift(`${player.name} が「${card.name}」を捨てました。`);
+      if (state.tutorial?.enabled) {
+        state.tutorial.step = state.tutorial.turn === 1
+          ? (state.current === 0 ? "watch" : state.current === 1 ? "noPair" : "discardPair")
+          : state.tutorial.turn === 2 && state.current === 2 ? "specialDiscardPair" : "watch";
+      }
       checkGoingOut(player);
       render();
+      if (state.tutorial?.enabled && state.tutorial.turn === 1) {
+        if (state.current === 0) showTutorialMessage("1ターン目・他プレイヤーの手番。次はP2、P3がカードを引いて捨てます。自分の手番でなくても、捨て札と手札でペアを作れるか確認しましょう。");
+        else if (state.current === 1) showTutorialMessage("1ターン目・ペアにできない捨て札。P2が銀貨を捨てました。あなたの手札とはペアにできないので「ペアなしで続行」を押して、次のプレイヤーへ進めましょう。");
+        else showTutorialMessage("1ターン目・捨て札とペア。P3が巻貝を捨てました。あなたも巻貝を持っています。操作列に出ている「巻貝でペア」のボタンで宣言しましょう。自分の手番でなくてもチップを獲得できます。");
+      } else if (state.tutorial?.step === "specialDiscardPair") {
+        showTutorialMessage("2ターン目・相手の捨て札で特殊ペア\nP3が真珠を捨てました。あなたの「真珠貝」は真珠と特殊ペアにできます。光っている「真珠貝でペア」のボタンを押しましょう。");
+      }
     }
 
     function discardPairOptions() {
@@ -2530,6 +2652,7 @@
       const start = pending.priorityFrom ?? ((pending.discarder + 1) % state.players.length);
       for (let step = 0; step < state.players.length; step++) {
         const playerIndex = (start + step) % state.players.length;
+        if (state.tutorial?.enabled && playerIndex !== 0) continue; // CPUは練習中の捨て札ペアを見送る。
         if (playerIndex === pending.discarder) continue;
         const player = state.players[playerIndex];
         if (player.out) continue;
@@ -2582,14 +2705,14 @@
     }
 
     function findDiscardAnimationSource(card, playerIndex) {
-      const ownCard = document.querySelector(`.card[data-uid="${card.uid}"]`);
+      const ownCard = playerIndex === 0 && document.querySelector(`#hand .card[data-uid="${card.uid}"]`);
       if (ownCard) return ownCard;
-      const seat = document.querySelector(`.opponent-seat[data-player-index="${playerIndex}"] .seat-card`);
+      const seat = document.querySelector(`.opponent-seat[data-player-index="${playerIndex}"] .seat-card:last-child`);
       if (seat) return seat;
       return document.querySelector(".pile") || document.querySelector(".table");
     }
 
-    function animateCardToDiscard(card, playerIndex) {
+    function animateCardToDiscard(card, playerIndex, after = null) {
       const source = findDiscardAnimationSource(card, playerIndex);
       const target = document.querySelector("#discardArea .card") || document.querySelector("#discardArea") || document.querySelector(".discard-wrap");
       if (!source || !target) return;
@@ -2611,15 +2734,23 @@
       const scale = Math.min(1.05, Math.max(.62, to.width / Math.max(width, 1)));
       const animation = ghost.animate([
         { transform: "translate(0, 0) scale(1) rotate(-2deg)", opacity: 1 },
+        { transform: `translate(${dx * .45}px, ${dy * .45 - 32}px) scale(${(1 + scale) / 2}) rotate(-10deg)`, opacity: 1, offset: .45 },
         { transform: `translate(${dx}px, ${dy}px) scale(${scale}) rotate(4deg)`, opacity: .98 }
-      ], { duration: 520, easing: "cubic-bezier(.2, .85, .25, 1)", fill: "forwards" });
-      animation.onfinish = () => ghost.remove();
+      ], { duration: playerIndex === 0 ? 520 : 650, easing: "cubic-bezier(.2, .85, .25, 1)", fill: "forwards" });
+      animation.onfinish = () => {
+        ghost.remove();
+        if (after) after();
+      };
       animation.oncancel = () => ghost.remove();
+      return animation;
     }
 
-    function animateDeckToHand() {
+    function animateDeckToHand(playerIndex = state.current) {
       const source = document.querySelector("#deckPile .card.back");
-      const target = document.querySelector("#hand .card") || document.querySelector("#hand");
+      const target = playerIndex === 0
+        ? (document.querySelector("#hand .card") || document.querySelector("#hand"))
+        : (document.querySelector(`.opponent-seat[data-player-index="${playerIndex}"] .seat-cards`) ||
+           document.querySelector(`.opponent-seat[data-player-index="${playerIndex}"]`));
       if (!source || !target) return;
       const from = source.getBoundingClientRect();
       const to = target.getBoundingClientRect();
@@ -2638,14 +2769,15 @@
       const dy = to.top + to.height / 2 - (from.top + from.height / 2);
       const animation = ghost.animate([
         { transform: "translate(0, 0) scale(1) rotate(0deg)", opacity: 1 },
-        { transform: `translate(${dx}px, ${dy}px) scale(1.02) rotate(-5deg)`, opacity: .98 }
-      ], { duration: 520, easing: "cubic-bezier(.2, .85, .25, 1)", fill: "forwards" });
+        { transform: `translate(${dx * .52}px, ${dy * .45 - 28}px) scale(1.05) rotate(${playerIndex % 2 ? 7 : -7}deg)`, opacity: 1, offset: .5 },
+        { transform: `translate(${dx}px, ${dy}px) scale(${playerIndex === 0 ? 1.02 : .72}) rotate(-5deg)`, opacity: .92 }
+      ], { duration: playerIndex === 0 ? 520 : 600, easing: "cubic-bezier(.2, .85, .25, 1)", fill: "forwards" });
       animation.onfinish = () => ghost.remove();
       animation.oncancel = () => ghost.remove();
     }
 
     function canDragDiscardCard(displayIndex) {
-      return displayIndex === 0 && isHumanTurn() && state.phase === "afterDraw" && !state.gameOver;
+      return !state.tutorial?.enabled && displayIndex === 0 && isHumanTurn() && state.phase === "afterDraw" && !state.gameOver;
     }
 
     function startHandCardLongPress(el, card, displayIndex, event) {
@@ -2767,7 +2899,7 @@
           }
         });
       }
-      actions.push({
+      if (!state.tutorial?.enabled) actions.push({
         label: "そのまま引く",
         className: "secondary",
         action: () => {
@@ -2781,6 +2913,7 @@
          <p>${chipNote} 次の自分のターン終了時までに上がれば、賭けた1枚が戻り、さらにチップ3枚を獲得します。上がれなければ賭けたチップは没収されます。</p>`,
         actions
       );
+      renderTutorialGuidance();
     }
 
     function drawCard() {
@@ -2793,7 +2926,7 @@
       }
       const card = state.deck.pop();
       playDrawSound();
-      if (isHumanTurn()) animateDeckToHand();
+      animateDeckToHand(state.current);
       player.hand.push(card);
       state.phase = "afterDraw";
       state.log.unshift(`${player.name} がカードを1枚引きました。`);
@@ -2836,6 +2969,7 @@
 
     function skipDiscardPair() {
       if (state.phase !== "discardPair") return;
+      if (state.tutorial?.enabled) state.tutorial.step = "watch";
       state.pendingDiscard = null;
       nextTurn();
     }
@@ -2904,11 +3038,14 @@
     }
 
     function nextTurn() {
+      // Discard confirmation may advance the turn before its auto-pass timer fires.
+      clearCpuTimer();
       if (state.gameOver) return render();
       state.selected = [];
       state.eventUsed = false;
       state.phase = "draw";
       for (const p of state.players) {
+        if (state.tutorial?.enabled) continue; // 5ターン目の上がりまで勝負の練習を継続。
         if (p.challenge && p.challenge.expiresAtStart) settleChallenge(p, false);
         else if (p.challenge) p.challenge.expiresAtStart = true;
       }
@@ -2929,6 +3066,22 @@
         }
         if (!p.out) break;
       } while (guard < 20);
+      if (state.tutorial?.enabled && state.current === 0) {
+        state.tutorial.turn++;
+        const lessons = {
+          2: ["secondDraw", "2ターン目。まずカードを引き、手札内のペアを練習しましょう。"],
+          3: ["thirdDraw", "3ターン目・イベントカード。まずカードを引きましょう。今回は事故イベントを実際に使います。"],
+          4: ["fourthDraw", "4ターン目・勝負宣言\n手札はダイヤ1枚です。引く前にチップ1枚を賭けて勝負宣言できます。次の自分の手番終了時までに上がれば、賭けた1枚が戻り、さらに3枚獲得します。「カードを引く」を押して「勝負する」を選びましょう。"],
+          5: ["fifthDraw", "5ターン目。CPUの捨て札とはペアにできませんでしたが、まだ勝負中です。「カードを引く」を押しましょう。"]
+        };
+        const lesson = lessons[state.tutorial.turn];
+        if (lesson) {
+          state.tutorial.step = lesson[0];
+          render();
+          showTutorialMessage(lesson[1]);
+          return;
+        }
+      }
       render();
     }
 
@@ -3005,7 +3158,9 @@
         return;
       }
       if (state.tutorial?.enabled && (state.tutorial.step === "eventUse" || state.tutorial.step === "eventChoice")) {
-        showTutorialClosingMessage();
+        state.tutorial.step = "accidentPair";
+        render();
+        showTutorialMessage("イベントカードを使ったことでペアが成立しました。\n事故でP2の胡椒が捨て札に出たため、あなたの胡椒とペアにできます。光っている「胡椒でペア」のボタンを押して宣言しましょう。");
         return;
       }
       if (options.toDiscardPair) {
@@ -3068,14 +3223,15 @@
     }
 
     function openAccidentModal() {
-      const targets = state.players.map((p, i) => ({ p, i })).filter(x => x.i !== state.current && !x.p.out && x.p.hand.length);
+      const targets = state.players.map((p, i) => ({ p, i })).filter(x => x.i !== state.current && !x.p.out && x.p.hand.length && (!state.tutorial?.enabled || x.i === 1));
       if (!targets.length) return { waitsForChoice: false };
       showModal("事故を起こす相手", `<p>相手の手札を見ずに1枚捨て札へ置きます。そのカードはペア宣言できます。</p><div class="choice-grid">${targets.map(x => `<div class="choice" data-accident="${x.i}">${x.p.name}<br><span class="mini">手札 ${x.p.hand.length}枚</span></div>`).join("")}</div>`, []);
       document.querySelectorAll("[data-accident]").forEach(el => {
         el.addEventListener("click", () => {
           const targetIndex = Number(el.dataset.accident);
           const target = state.players[targetIndex];
-          const discarded = target.hand.splice(Math.floor(Math.random() * target.hand.length), 1)[0];
+          const discardIndex = state.tutorial?.enabled ? target.hand.findIndex(card => card.id === "pepper") : Math.floor(Math.random() * target.hand.length);
+          const discarded = target.hand.splice(discardIndex, 1)[0];
            animateCardToDiscard(discarded, targetIndex);
            state.discard.push(discarded);
            playDiscardSound();
@@ -3144,6 +3300,7 @@
     function render() {
       if (!state) return;
       $("gameApp").classList.toggle("dealing", !!state.dealing);
+      $("gameApp").classList.toggle("awaiting-tutorial-deal", !!state.awaitingTutorialDeal);
       renderCutin();
       renderPlayers();
       renderOpponentRail();
@@ -3325,6 +3482,16 @@
         $("discardArea").innerHTML = `<div class="empty">捨て札はありません。</div>`;
         return;
       }
+      if (state.initialDiscardPlaced === false) {
+        $("discardHint").textContent = "最初の1枚を置いています";
+        $("discardArea").innerHTML = `<div class="empty">捨て札を準備中…</div>`;
+        return;
+      }
+      if (top.uid === state.initialDiscardFaceDownUid) {
+        $("discardHint").textContent = "裏向きのため内容は非公開";
+        $("discardArea").innerHTML = `<div class="discard-row">${cardBackHtml()}</div>`;
+        return;
+      }
       let claimers = "";
       if (state.phase === "discardPair") {
         const options = discardPairOptions();
@@ -3352,6 +3519,33 @@
       $("log").innerHTML = state.log.slice(0, 80).map(item => `<div class="log-item">${item}</div>`).join("");
     }
 
+    function renderTutorialGuidance() {
+      document.querySelectorAll(".tutorial-target").forEach(el => el.classList.remove("tutorial-target"));
+      if (!state?.tutorial?.enabled || state.gameOver || !$("tutorialOverlay").classList.contains("hidden")) return;
+      const step = state.tutorial.step;
+      const mark = selector => document.querySelectorAll(selector).forEach(el => {
+        if (!el.disabled) el.classList.add("tutorial-target");
+      });
+      const markCard = uid => mark(`#hand .card[data-uid="${uid}"]`);
+      if (step === "fourthDraw" && $("modal").classList.contains("open")) mark("#modalActions button:first-child");
+      else if (["firstDraw", "secondDraw", "thirdDraw", "fourthDraw", "fifthDraw"].includes(step)) mark("#drawBtn");
+      else if (["firstDiscard", "fourthDiscard", "handPair", "finishPair", "eventUse"].includes(step)) {
+        const wantedId = {firstDiscard: "wheat", fourthDiscard: "wheat", handPair: "gold", finishPair: "diamond", eventUse: "accident"}[step];
+        const wanted = state.players[0].hand.filter(card => card.id === wantedId);
+        const unwanted = state.selected.filter(uid => !wanted.some(card => card.uid === uid));
+        // First guide the user to deselect any unrelated cards.
+        if (unwanted.length) unwanted.forEach(markCard);
+        else {
+          const remaining = wanted.filter(card => !state.selected.includes(card.uid));
+          if (remaining.length) remaining.forEach(card => markCard(card.uid));
+          else mark(step === "eventUse" ? "#eventBtn" : ["firstDiscard", "fourthDiscard"].includes(step) ? "#discardBtn" : "#pairBtn");
+        }
+      } else if (step === "noPair") mark("#skipDiscardPairBtn");
+      else if (["discardPair", "specialDiscardPair", "accidentPair"].includes(step)) mark('#discardClaimActions .claim[data-player="0"]');
+      else if (step === "eventChoice") mark('[data-accident="1"]');
+      else if (step === "score" || step === "scoreViewed") mark("#toggleScores");
+    }
+
     function renderButtons() {
       const p = currentPlayer();
       const human = isHumanTurn();
@@ -3370,12 +3564,13 @@
       $("skipDiscardPairBtn").disabled = locked || state.phase !== "discardPair" || state.gameOver || cpuHasDiscardPriority;
       if (state.tutorial?.enabled) {
         const step = state.tutorial.step;
-        $("drawBtn").disabled = !(["handDraw", "specialDraw", "eventDraw"].includes(step) && state.phase === "draw");
-        $("pairBtn").disabled = !((step === "handPair" || step === "specialPair") && state.phase === "afterDraw");
-        $("eventBtn").disabled = !(step === "eventUse" && state.phase === "afterDraw" && !state.eventUsed);
-        $("discardBtn").disabled = true;
-        $("skipDiscardPairBtn").disabled = true;
+        $("drawBtn").disabled = !(human && ["firstDraw", "secondDraw", "thirdDraw", "fourthDraw", "fifthDraw"].includes(step) && state.phase === "draw");
+        $("pairBtn").disabled = !(human && ["handPair", "finishPair"].includes(step) && validHandPair && state.phase === "afterDraw");
+        $("eventBtn").disabled = !(human && step === "eventUse" && validEvent && cards[0].id === "accident" && !state.eventUsed);
+        $("discardBtn").disabled = !(human && ["firstDiscard", "fourthDiscard"].includes(step) && cards.length === 1 && cards[0].id === "wheat");
+        $("skipDiscardPairBtn").disabled = !(step === "noPair" && state.phase === "discardPair");
       }
+      renderTutorialGuidance();
     }
 
     function confirmQuitGame() {
@@ -3504,11 +3699,45 @@
       bgm.currentTime = 0;
     }
 
+    function selectCardKindTab(kind) {
+      ["special", "event"].forEach(name => {
+        const selected = name === kind;
+        $(name + "CardsTab").setAttribute("aria-selected", String(selected));
+        $(name + "CardsPanel").classList.toggle("hidden", !selected);
+      });
+    }
+
+    function setupCardKindTabs() {
+      $("specialCardsPanel").innerHTML = '<h2>特殊ペアカード（3種類）</h2><p>指定された別の絵柄とペアを作れます。下記は特殊な組み合わせで得られるチップ数です。</p><div class="card-list">' +
+        SPECIALS.map(card => `<div class="card-rule"><strong>${card.icon} ${card.name}×${card.count}枚</strong>${card.text}。チップ${card.pairScore}枚。</div>`).join("") + '</div>';
+      $("eventCardsPanel").innerHTML = '<h2>イベントカード（6種類）</h2><p>自分の手番で、捨てる代わりに使えます。イベントカード自体ではペアを作れません。</p><div class="card-list">' +
+        EVENTS.map(card => `<div class="card-rule"><strong>${card.icon} ${card.name}×2枚</strong>${card.text}</div>`).join("") + '</div>';
+      ["special", "event"].forEach((kind, index, kinds) => {
+        const tab = $(kind + "CardsTab");
+        tab.addEventListener("click", () => selectCardKindTab(tab.getAttribute("aria-selected") === "true" ? null : kind));
+        tab.addEventListener("keydown", event => {
+          if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+          event.preventDefault();
+          const next = event.key === "Home" ? kinds[0] : event.key === "End" ? kinds[1] : kinds[1 - index];
+          selectCardKindTab(next);
+          $(next + "CardsTab").focus();
+        });
+      });
+    }
+
     $("newGame").addEventListener("click", confirmQuitGame);
+    setupCardKindTabs();
     $("toggleScores").addEventListener("click", () => {
       if (!state) return;
       state.scoresCollapsed = !state.scoresCollapsed;
       render();
+      if (state.tutorial?.enabled && state.tutorial.step === "score" && !state.scoresCollapsed) {
+        state.tutorial.step = "scoreViewed";
+      } else if (state.tutorial?.enabled && state.tutorial.step === "scoreViewed" && state.scoresCollapsed) {
+        state.tutorial.step = "watch";
+        nextTurn();
+      }
+      renderTutorialGuidance();
     });
     $("startGame").addEventListener("click", () => {
       $("playerCount").value = $("startPlayerCount").value;
