@@ -5,7 +5,7 @@
 /* Games banner artwork */
 .portal-games{
   background-image:
-    linear-gradient(90deg,rgba(24,28,49,.05) 0%,rgba(24,28,49,.12) 38%,rgba(24,28,49,.9) 67%,rgba(24,28,49,.96) 100%),
+    linear-gradient(90deg,rgba(24,28,49,0) 0%,rgba(24,28,49,.04) 43%,rgba(24,28,49,.62) 72%,rgba(24,28,49,.78) 100%),
     url('/games-banner.png');
   background-position:center 42%;
   background-size:cover;
@@ -21,13 +21,32 @@
 .portal-games .banner-copy small{color:#f6de72;text-shadow:0 1px 7px rgba(8,12,26,.9)}
 .portal-games .banner-arrow,.portal-games .banner-no{color:#fffdf4}
 
+.portal-art{
+  background-image:
+    linear-gradient(90deg,rgba(24,28,49,0) 0%,rgba(24,28,49,.04) 43%,rgba(24,28,49,.62) 72%,rgba(24,28,49,.78) 100%),
+    url('/art-banner.png');
+  background-position:center 43%;
+  background-size:cover;
+  color:#fffdf4;
+  text-shadow:0 2px 10px rgba(8,12,26,.75);
+}
+.portal-art .banner-visual>i,
+.portal-art .banner-visual>span,
+.portal-art .banner-visual>b,
+.portal-art .banner-visual:before,
+.portal-art .banner-visual:after{display:none}
+.portal-art .banner-copy{position:relative;z-index:2}
+.portal-art .banner-copy small{color:#f6de72;text-shadow:0 1px 7px rgba(8,12,26,.9)}
+.portal-art .banner-arrow,.portal-art .banner-no{color:#fffdf4}
+
 @media(max-width:480px){
-  .portal-games{
+  .portal-games,.portal-art{
     background-image:
-      linear-gradient(90deg,rgba(24,28,49,.12) 0%,rgba(24,28,49,.28) 34%,rgba(24,28,49,.94) 62%,rgba(24,28,49,.98) 100%),
-      url('/games-banner.png');
-    background-position:center 40%;
+      linear-gradient(90deg,rgba(24,28,49,.02) 0%,rgba(24,28,49,.12) 36%,rgba(24,28,49,.7) 67%,rgba(24,28,49,.86) 100%),
+      var(--banner-image);
   }
+  .portal-games{--banner-image:url('/games-banner.png');background-position:center 40%}
+  .portal-art{--banner-image:url('/art-banner.png');background-position:center 42%}
 }
 /* creator portal theme */
 
