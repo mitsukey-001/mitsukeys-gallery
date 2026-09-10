@@ -8,3 +8,19 @@
 @media(max-width:800px){.shells-game-art{height:500px}.shells-game-art i{margin-top:410px}}
 .prototype-game{margin-top:110px;padding-top:90px;border-top:1px solid #c9c1a5;display:grid;grid-template-columns:1.2fr 1fr;gap:7vw;align-items:center}.prototype-game small{font:10px Georgia,serif;letter-spacing:.15em;color:#8d4a34}.prototype-game h2{font:600 clamp(42px,5vw,70px)/1.25 "Yu Mincho",serif;margin:16px 0}.prototype-game p{font-size:13px;line-height:2}.prototype-game dl{border-top:1px solid #cdc5a7;margin:30px 0}.prototype-game dl div{display:grid;grid-template-columns:80px 1fr;border-bottom:1px solid #cdc5a7;padding:13px 0;font-size:12px}.prototype-game dt{font-weight:700}.prototype-game dd{margin:0}.prototype-art{height:520px;position:relative;overflow:hidden;background:#e5ce60;color:#2b2c25;border:1px solid #2b2c25;box-shadow:18px 18px 0 #d94135}.prototype-art:before,.prototype-art:after{content:"";position:absolute;border:2px solid #2b2c25;border-radius:50%}.prototype-art:before{width:390px;height:390px;right:-80px;top:-90px}.prototype-art:after{width:240px;height:240px;left:-70px;bottom:-60px}.prototype-art span{position:absolute;left:8%;top:8%;font:16px Georgia,serif}.prototype-art b{position:absolute;left:8%;top:38%;font:700 clamp(42px,5vw,74px)/.9 Georgia,serif;letter-spacing:.04em;z-index:1}.prototype-art i{position:absolute;right:7%;bottom:7%;font:12px Georgia,serif;letter-spacing:.18em;z-index:1}
 @media(max-width:800px){.prototype-game{grid-template-columns:1fr}.prototype-art{height:460px}}@media(max-width:480px){.prototype-game{margin-top:80px;padding-top:65px}.prototype-art{height:360px}}
+
+/* artwork gallery */
+.art-gallery{padding:80px 6vw 130px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
+.art-thumb{position:relative;aspect-ratio:1/1;overflow:hidden;border:0;padding:0;background:#e8dfc1;cursor:zoom-in}
+.art-thumb img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .35s ease,filter .35s ease}
+.art-thumb span{position:absolute;left:12px;bottom:10px;display:grid;place-items:center;width:34px;height:34px;background:rgba(37,37,31,.82);color:#fffdf4;font:11px Georgia,serif;letter-spacing:.08em}
+.art-thumb:hover img,.art-thumb:focus-visible img{transform:scale(1.035);filter:brightness(.9)}
+.art-thumb:focus-visible{outline:4px solid #d94135;outline-offset:3px}
+.art-lightbox{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;background:rgba(22,24,21,.94);padding:68px 5vw 48px;cursor:zoom-out}
+.art-lightbox img{display:block;max-width:92vw;max-height:calc(100vh - 130px);width:auto;height:auto;object-fit:contain;box-shadow:0 18px 60px rgba(0,0,0,.45);cursor:default}
+.art-lightbox p{position:absolute;left:24px;bottom:18px;margin:0;color:#fffdf4;font:11px Georgia,serif;letter-spacing:.15em}
+.lightbox-close{position:absolute;right:22px;top:20px;border:1px solid rgba(255,255,255,.55);background:rgba(0,0,0,.18);color:#fffdf4;padding:11px 15px;font-size:13px;cursor:pointer}
+.lightbox-close:focus-visible{outline:3px solid #f3d767;outline-offset:3px}
+@media(max-width:900px){.art-gallery{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:640px){.art-gallery{padding:48px 4vw 90px;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.art-lightbox{padding-inline:3vw}.art-lightbox img{max-width:94vw}.art-thumb span{left:8px;bottom:8px;width:30px;height:30px}}
+
