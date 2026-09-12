@@ -3,14 +3,14 @@
 import { useEffect, useState } from 'react';
 
 const works = [
-  '/art/art-01.png',
-  '/art/art-02.jpg',
-  '/art/art-03.jpg',
-  '/art/art-04.jpg',
-  '/art/art-05.jpg',
-  '/art/art-06.jpg',
-  '/art/art-07.jpg',
-  '/art/art-08.png',
+  '/art/art-01.webp',
+  '/art/art-02.webp',
+  '/art/art-03.webp',
+  '/art/art-04.webp',
+  '/art/art-05.webp',
+  '/art/art-06.webp',
+  '/art/art-07.webp',
+  '/art/art-08.webp',
 ];
 
 export default function Gallery() {
@@ -40,7 +40,7 @@ export default function Gallery() {
             onClick={() => setSelected(index)}
             aria-label={`イラスト ${index + 1} を拡大表示`}
           >
-            <img src={src} alt={`イラスト ${index + 1}`} loading="lazy" />
+            <img src={`/art/thumb-${String(index + 1).padStart(2, '0')}.webp`} alt={`イラスト ${index + 1}`} loading="lazy" />
             <span>{String(index + 1).padStart(2, '0')}</span>
           </button>
         ))}
