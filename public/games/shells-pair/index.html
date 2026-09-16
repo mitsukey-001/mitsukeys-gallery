@@ -33,6 +33,8 @@
       min-height: 100vh;
     }
 
+    body.game-playing { overflow: hidden; }
+
     button, select, input {
       font: inherit;
     }
@@ -114,6 +116,16 @@
       margin: 0 auto;
       padding: 8px 14px 12px;
     }
+
+    #gameApp:not(.hidden) {
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    #gameApp > header { flex: 0 0 auto; }
+    #gameApp > main { flex: 1 1 auto; min-height: 0; }
 
     .hidden { display: none !important; }
 
@@ -480,9 +492,17 @@
     .setup {
       display: flex;
       align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
+      gap: 5px;
+      flex-wrap: nowrap;
       justify-content: end;
+    }
+
+    .setup button,
+    .setup select {
+      min-height: 32px;
+      padding: 5px 8px;
+      font-size: 12px;
+      white-space: nowrap;
     }
 
     .setup label {
@@ -588,7 +608,7 @@
 
     main {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 340px;
+      grid-template-columns: minmax(0, 1fr);
       gap: 14px;
     }
 
@@ -610,6 +630,7 @@
       background:
         repeating-linear-gradient(45deg, rgba(255,255,255,.035) 0 1px, transparent 1px 13px),
         linear-gradient(180deg, var(--felt), var(--felt-dark));
+      min-height: 0;
     }
 
     .table > * {
@@ -843,7 +864,7 @@
     .piles {
       display: flex;
       gap: 10px;
-      align-items: stretch;
+      align-items: flex-end;
       justify-content: end;
     }
 
@@ -875,6 +896,7 @@
       gap: 6px;
       margin: 6px 0;
       align-items: center;
+      justify-content: center;
     }
 
     .actions button {
@@ -903,15 +925,67 @@
     }
 
     .hand {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(104px, 1fr));
-      gap: 8px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: var(--hand-gap, 8px);
       min-height: 148px;
-      padding: 8px;
+      padding: 18px 8px 0;
       border: 1px solid rgba(244, 231, 201, .26);
       border-radius: 8px;
       background: rgba(5, 51, 42, .32);
+      flex: 0 0 190px;
+      min-height: 0;
+      overflow: hidden;
     }
+
+    .hand .card {
+      flex: 0 0 104px;
+      width: 104px;
+      min-width: 104px;
+      max-width: 104px;
+      min-height: 142px;
+      height: 142px;
+      max-height: 142px;
+      position: relative;
+      transition: margin-left .16s ease, transform .16s ease;
+    }
+    .hand .card + .card { margin-left: calc(-1 * var(--hand-overlap, 0px)); }
+    .hand .card:hover,
+    .hand .card:focus-visible,
+    .hand .card.selected { z-index: 20; }
+    .hand > .empty { flex: 1 1 auto; width: 100%; }
+
+    .play-log-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1300;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      background: rgba(2, 24, 40, .58);
+      backdrop-filter: blur(3px);
+      -webkit-backdrop-filter: blur(3px);
+    }
+    .play-log-dialog {
+      width: min(880px, 100%);
+      max-height: min(82dvh, 760px);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 16px;
+      overflow: hidden;
+      border: 1px solid rgba(135, 224, 255, .76);
+      border-radius: 14px;
+      background: rgba(247, 252, 252, .96);
+      box-shadow: 0 24px 60px rgba(0, 15, 29, .48);
+    }
+    .play-log-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .play-log-head h2, .pair-history h3 { margin: 0; }
+    .play-log-content { min-height: 0; overflow-y: auto; display: grid; gap: 14px; }
+    .pair-history-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .pair-history-item { padding: 9px; border: 1px solid #b8dce8; border-radius: 8px; background: #edfaff; }
+    .pair-history-empty { color: var(--muted); font-size: 13px; }
 
     .card {
       min-height: 142px;
@@ -1544,10 +1618,22 @@
       .setup label { display: none; }
       .setup button,
       .setup select {
-        min-height: 34px;
-        padding: 6px 8px;
-        font-size: 12px;
+        min-width: 0;
+        min-height: 32px;
+        padding: 4px 3px;
+        font-size: clamp(9px, 2.8vw, 11px);
+        line-height: 1;
       }
+      .setup {
+        width: 100%;
+        gap: 3px;
+        flex-wrap: nowrap;
+      }
+      .setup select {
+        flex: 0 0 40px;
+        width: 40px;
+      }
+      .setup button { flex: 1 1 0; }
       .status-grid {
         top: 52px;
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1568,7 +1654,7 @@
         grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 5px;
         margin-bottom: 6px;
-        padding: 6px;
+        padding: 14px 6px 0;
       }
       .opponent-seat {
         min-height: 62px;
@@ -1626,13 +1712,15 @@
       .hint { font-size: 12px; }
       .piles { display: none; }
       .actions {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        display: flex;
+        flex-wrap: wrap;
         gap: 6px;
         margin: 7px 0;
+        justify-content: center;
       }
       .actions button {
-        width: 100%;
+        flex: 0 1 calc(50% - 3px);
+        width: auto;
         height: 30px;
         padding: 5px 5px;
         font-size: 11px;
@@ -1682,10 +1770,12 @@
         max-height: 34px;
       }
       .hand {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 6px;
-        min-height: 112px;
-        padding: 6px;
+        display: flex;
+        justify-content: center;
+        gap: var(--hand-gap, 6px);
+        min-height: 134px;
+        flex-basis: 134px;
+        padding: 14px 6px 0;
       }
       .card {
         min-height: 104px;
@@ -1695,6 +1785,21 @@
         gap: 3px;
         box-shadow: 0 5px 0 rgba(89, 59, 28, .18), 0 10px 12px rgba(8, 19, 17, .16);
       }
+      .hand .card {
+        flex-basis: 72.8px;
+        width: 72.8px;
+        min-width: 72.8px;
+        max-width: 72.8px;
+        min-height: 99.4px;
+        height: 99.4px;
+        max-height: 99.4px;
+        padding: 4px;
+      }
+      .hand .icon { font-size: clamp(18px, 7vw, 30px); }
+      .hand .card-name { font-size: clamp(9px, 3vw, 13px); }
+      .pair-history-list { grid-template-columns: 1fr; }
+      .play-log-overlay { padding: 8px; }
+      .play-log-dialog { max-height: 92dvh; padding: 10px; }
       .card.selected { transform: translateY(-7px) scale(1.025); }
       .card.selected::after {
         top: 4px;
@@ -1858,6 +1963,7 @@
           <option value="4" selected>4人</option>
         </select>
         <button id="toggleScores" class="secondary">スコアを表示する</button>
+        <button id="togglePlayLog" class="secondary">プレイログ</button>
         <button id="newGame" class="danger">ゲームをやめる</button>
       </div>
     </header>
@@ -1874,7 +1980,6 @@
           </div>
           <div class="piles">
             <div class="pile"><span class="mini">山札</span><strong id="deckCount">0</strong></div>
-            <div class="pile"><span class="mini">チップ</span><strong id="bankCount">0</strong></div>
           </div>
         </div>
 
@@ -1909,16 +2014,26 @@
         <div id="hand" class="hand"></div>
       </section>
 
-      <aside class="side">
-        <h2>ログ</h2>
-        <div id="log" class="log"></div>
-        <div class="rules">
-          <div>通常ペアはカードの星数ぶんチップを得ます。</div>
-          <div>特殊ペアは指定カードと組め、組み合わせごとのチップを得ます。</div>
-          <div>イベントカードは使用後にターンが終了します。事故で捨てられたカードのみ、捨て札ペア宣言ができます。</div>
-        </div>
-      </aside>
     </main>
+  </div>
+
+  <div id="playLogOverlay" class="play-log-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="playLogTitle">
+    <div class="play-log-dialog">
+      <div class="play-log-head">
+        <h2 id="playLogTitle">プレイログ</h2>
+        <button id="closePlayLog" class="secondary" type="button">閉じる</button>
+      </div>
+      <div class="play-log-content">
+        <section class="pair-history">
+          <h3>成立したペア</h3>
+          <div id="pairHistory" class="pair-history-list"></div>
+        </section>
+        <section>
+          <h3>進行履歴</h3>
+          <div id="log" class="log"></div>
+        </section>
+      </div>
+    </div>
   </div>
 
   <div id="modal" class="modal" role="dialog" aria-modal="true">
@@ -1991,6 +2106,8 @@
     const $ = (id) => document.getElementById(id);
 
     function showSplashScreen() {
+      document.body.classList.remove("game-playing");
+      closePlayLog();
       stopGameBgm();
       clearDealAnimation();
       clearCpuTimer();
@@ -2005,6 +2122,8 @@
     }
 
     function showStartScreen() {
+      document.body.classList.remove("game-playing");
+      closePlayLog();
       stopGameBgm();
       clearDealAnimation();
       clearCpuTimer();
@@ -2019,6 +2138,7 @@
     }
 
     function showGameScreen() {
+      document.body.classList.add("game-playing");
       $("splashScreen").classList.add("hidden");
       $("startScreen").classList.add("hidden");
       $("gameApp").classList.remove("hidden");
@@ -2776,17 +2896,19 @@
       animation.oncancel = () => ghost.remove();
     }
 
-    function canDragDiscardCard(displayIndex) {
-      return !state.tutorial?.enabled && displayIndex === 0 && isHumanTurn() && state.phase === "afterDraw" && !state.gameOver;
+    function canDragDiscardCard(displayIndex, card = null) {
+      const active = displayIndex === 0 && isHumanTurn() && state.phase === "afterDraw" && !state.gameOver;
+      if (!active) return false;
+      if (!state.tutorial?.enabled) return true;
+      return ["firstDiscard", "fourthDiscard"].includes(state.tutorial.step) && (!card || card.id === "wheat");
     }
 
-    function startHandCardLongPress(el, card, displayIndex, event) {
-      if (!canDragDiscardCard(displayIndex)) return;
+    function startHandCardDrag(el, card, displayIndex, event) {
+      if (!canDragDiscardCard(displayIndex, card) || (event.pointerType === "mouse" && event.button !== 0)) return;
       const startX = event.clientX;
       const startY = event.clientY;
       const pointerId = event.pointerId;
-      const timer = setTimeout(() => beginHandCardDrag(el, card, pointerId, startX, startY), 420);
-      handDrag = { timer, pointerId, card, source: el, startX, startY, dragging: false, suppressClick: false, ghost: null };
+      handDrag = { pointerId, card, source: el, startX, startY, dragging: false, suppressClick: false, ghost: null };
       el.setPointerCapture?.(pointerId);
     }
 
@@ -2812,9 +2934,7 @@
       if (!handDrag || handDrag.pointerId !== event.pointerId) return;
       const dx = event.clientX - handDrag.startX;
       const dy = event.clientY - handDrag.startY;
-      if (!handDrag.dragging && Math.hypot(dx, dy) > 14) {
-        clearTimeout(handDrag.timer);
-      }
+      if (!handDrag.dragging && Math.hypot(dx, dy) > 8) beginHandCardDrag(handDrag.source, handDrag.card, handDrag.pointerId, event.clientX, event.clientY);
       if (!handDrag.dragging || !handDrag.ghost) return;
       event.preventDefault();
       const rect = handDrag.ghost.getBoundingClientRect();
@@ -2831,7 +2951,6 @@
 
     function finishHandCardDrag(event) {
       if (!handDrag || handDrag.pointerId !== event.pointerId) return;
-      clearTimeout(handDrag.timer);
       const drag = handDrag;
       handDrag = null;
       drag.source?.releasePointerCapture?.(event.pointerId);
@@ -2840,7 +2959,8 @@
       if (!drag.dragging) return;
       event.preventDefault();
       if (drag.source) drag.source.dataset.suppressClick = "1";
-      const dropped = isPointInDiscardZone(event.clientX, event.clientY);
+      const swipeUp = event.clientY - drag.startY < -45 && Math.hypot(event.clientX - drag.startX, event.clientY - drag.startY) > 70;
+      const dropped = isPointInDiscardZone(event.clientX, event.clientY) || swipeUp;
       if (dropped && state.phase === "afterDraw") {
         settleDraggedDiscardGhost(drag.ghost, () => discardCardDirect(drag.card, { skipAnimation: true }));
       } else {
@@ -3405,7 +3525,6 @@
       $("hint").textContent = hints[state.phase];
       $("deckCount").textContent = state.deck.length;
       $("deckCountBoard").textContent = state.deck.length;
-      $("bankCount").textContent = state.bank;
       $("handLabel").textContent = !isHumanTurn() && state.phase !== "gameOver" ? "P1 の手札" : `${p.name} の手札`;
       $("handLabel").textContent = `${p.name} の手札`;
     }
@@ -3422,8 +3541,8 @@
       $("hand").innerHTML = p.hand.map(card => cardHtml(card, ready.has(card.uid))).join("");
       document.querySelectorAll(".card[data-uid]").forEach(el => {
         const card = p.hand.find(c => c.uid === el.dataset.uid);
-        if (canDragDiscardCard(displayIndex)) el.classList.add("drag-discard-enabled");
-        el.addEventListener("pointerdown", (event) => startHandCardLongPress(el, card, displayIndex, event));
+        if (canDragDiscardCard(displayIndex, card)) el.classList.add("drag-discard-enabled");
+        el.addEventListener("pointerdown", (event) => startHandCardDrag(el, card, displayIndex, event));
         el.addEventListener("pointermove", moveHandCardDrag);
         el.addEventListener("pointerup", finishHandCardDrag);
         el.addEventListener("pointercancel", finishHandCardDrag);
@@ -3444,6 +3563,28 @@
           render();
         });
       });
+      updateHandOverlap();
+    }
+
+    function updateHandOverlap() {
+      const hand = $("hand");
+      if (!hand) return;
+      const count = hand.querySelectorAll(".card[data-uid]").length;
+      if (count < 2) {
+        hand.style.setProperty("--hand-gap", "8px");
+        hand.style.setProperty("--hand-overlap", "0px");
+        return;
+      }
+      const cardWidth = window.matchMedia("(max-width: 560px)").matches ? 72.8 : 104;
+      const preferredGap = 8;
+      const horizontalPadding = 16;
+      const available = Math.max(cardWidth, hand.clientWidth - horizontalPadding);
+      const preferredWidth = count * cardWidth + (count - 1) * preferredGap;
+      const overlap = preferredWidth <= available
+        ? 0
+        : Math.min(cardWidth - 12, (count * cardWidth - available) / (count - 1));
+      hand.style.setProperty("--hand-gap", overlap ? "0px" : `${preferredGap}px`);
+      hand.style.setProperty("--hand-overlap", `${overlap.toFixed(2)}px`);
     }
 
     function cardTypeLabel(card) {
@@ -3517,6 +3658,28 @@
 
     function renderLog() {
       $("log").innerHTML = state.log.slice(0, 80).map(item => `<div class="log-item">${item}</div>`).join("");
+      const pairs = [];
+      state.players.forEach(player => {
+        for (let i = 0; i + 1 < player.won.length; i += 2) {
+          const a = player.won[i];
+          const b = player.won[i + 1];
+          pairs.push({ player: player.name, a, b, reward: pairReward(a, b) });
+        }
+      });
+      $("pairHistory").innerHTML = pairs.length
+        ? pairs.map(pair => `<div class="pair-history-item"><strong>${pair.player}</strong><br>${pair.a.icon} ${pair.a.name} ＋ ${pair.b.icon} ${pair.b.name}<br><span class="mini">チップ${pair.reward}枚のペア</span></div>`).join("")
+        : `<div class="pair-history-empty">まだ成立したペアはありません。</div>`;
+    }
+
+    function openPlayLog() {
+      if (!state) return;
+      renderLog();
+      $("playLogOverlay").classList.remove("hidden");
+      $("closePlayLog").focus();
+    }
+
+    function closePlayLog() {
+      $("playLogOverlay")?.classList.add("hidden");
     }
 
     function renderTutorialGuidance() {
@@ -3727,6 +3890,14 @@
 
     $("newGame").addEventListener("click", confirmQuitGame);
     setupCardKindTabs();
+    $("togglePlayLog").addEventListener("click", openPlayLog);
+    $("closePlayLog").addEventListener("click", closePlayLog);
+    $("playLogOverlay").addEventListener("click", event => {
+      if (event.target.id === "playLogOverlay") closePlayLog();
+    });
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape" && !$("playLogOverlay").classList.contains("hidden")) closePlayLog();
+    });
     $("toggleScores").addEventListener("click", () => {
       if (!state) return;
       state.scoresCollapsed = !state.scoresCollapsed;
@@ -3757,6 +3928,11 @@
       if (e.target.id === "modal") closeModal();
     });
     document.addEventListener("pointerdown", showTapRipple, { capture: true, passive: true });
+    let handResizeFrame = null;
+    window.addEventListener("resize", () => {
+      cancelAnimationFrame(handResizeFrame);
+      handResizeFrame = requestAnimationFrame(updateHandOverlap);
+    }, { passive: true });
 
     showSplashScreen();
   </script>
