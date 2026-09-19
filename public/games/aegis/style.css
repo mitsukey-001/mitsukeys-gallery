@@ -6,3 +6,7 @@
 
 .ships.loadouts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}.loadouts button{padding:12px}.loadouts strong{font-size:18px;letter-spacing:0;margin:6px 0}.loadouts small{font-size:12px}.panel>.muted{margin:8px 0}#overlay .panel{max-height:100%;overflow-y:auto}
 
+#spirit { accent-color: #d0a4ff; height: 14px; }
+#spirit::-webkit-progress-value { background: linear-gradient(90deg,#7dc9ec,#d0a4ff); }
+#spiritMoves { color: #e1caff; line-height: 1.7; }
+
