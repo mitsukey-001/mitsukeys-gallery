@@ -9,4 +9,7 @@
 #spirit { accent-color: #d0a4ff; height: 14px; }
 #spirit::-webkit-progress-value { background: linear-gradient(90deg,#7dc9ec,#d0a4ff); }
 #spiritMoves { color: #e1caff; line-height: 1.7; }
+.stage-choice{display:flex;gap:14px;align-items:center;justify-content:center;margin:10px 0 16px;font-size:14px}.stage-choice select{max-width:270px;background:#162f3b;border:1px solid #587d89;color:#e1f3f7;border-radius:6px;padding:8px;font:inherit}.panel .stage-choice{color:#cae4dc}
+.bonus-panel{max-width:680px}.bonus-panel h1{font-size:28px;margin:8px 0}.bonus-panel h2{font-size:19px}.bonus-summary{background:#142b37;padding:8px 14px;border-radius:8px;text-align:left}.bonus-summary p{line-height:1.7;overflow-wrap:anywhere}.bonus-choices{display:grid;grid-template-columns:1fr;gap:8px;margin:12px 0}.bonus-choice{text-align:left;padding:12px;border:2px solid #375465}.bonus-choice strong,.bonus-choice small{display:block}.bonus-choice small{color:#accbd4;margin-top:5px}.bonus-choice.selected{border-color:#b6f29a;background:#294134}.bonus-panel .primary{width:100%;margin-top:8px}
+#overlay.bonus-overlay{position:fixed;inset:0;z-index:1000;padding:18px;background:#030c14e8;overflow:hidden;box-sizing:border-box}.bonus-overlay .bonus-panel{max-height:calc(100dvh - 36px);overflow-y:auto;padding:18px;background:#0c1b27;border:1px solid #405b69;border-radius:12px;box-sizing:border-box}.bonus-panel #bonus-confirm{position:sticky;bottom:0;z-index:1}
 
