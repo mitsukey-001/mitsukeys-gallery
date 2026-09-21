@@ -49,4 +49,7 @@
   .portal-art{--banner-image:url('/art-banner.png');background-position:center 42%}
 }
 /* creator portal theme */
+.creator-icon{background:#f8df2d url('/mitsukii-icon.jpg') center/contain no-repeat}
+.creator-icon:before,.creator-icon:after{display:none}
+.creator-icon strong{color:#27271f;background:rgba(255,253,244,.82);padding:8px 10px;border:1px solid rgba(39,39,31,.24)}
 
