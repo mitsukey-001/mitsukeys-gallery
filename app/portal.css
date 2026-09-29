@@ -52,4 +52,4 @@
 .creator-icon{background:#f8df2d url('/mitsukii-icon.jpg') center/contain no-repeat}
 .creator-icon:before,.creator-icon:after{display:none}
 .creator-icon strong{color:#27271f;background:rgba(255,253,244,.82);padding:8px 10px;border:1px solid rgba(39,39,31,.24)}
-
+.portal-banner-static{cursor:default}.portal-banner-static:hover{transform:none;box-shadow:none}.banner-status{position:absolute;inset:50% auto auto 50%;transform:translate(-50%,-50%) rotate(-4deg);z-index:5;display:block;width:max-content;padding:12px 18px;background:#d94135;color:#fffdf4;border:2px solid #302f27;box-shadow:5px 5px 0 rgba(48,47,39,.25);font:700 18px/1.2 "Yu Mincho",serif;letter-spacing:.12em}

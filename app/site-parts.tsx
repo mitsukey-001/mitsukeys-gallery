@@ -1,5 +1,5 @@
 export function Header() {
-  return <header className="portal-header sub-header"><a className="mitsukii-logo" href="/"><b>石ノ神</b>みつきぃ<small>ISHINOGAMI MITSUKII</small></a><nav><a href="/games">GAME</a><a href="/art">ART</a><a href="/comic">COMIC</a></nav><a className="contact-pill" href="/">TOP</a></header>;
+  return <header className="portal-header sub-header"><a className="mitsukii-logo" href="/"><b>石ノ神</b>みつきぃ<small>ISHINOGAMI MITSUKII</small></a><nav><a href="/games">GAME</a><a href="/art">ART</a></nav><a className="contact-pill" href="/">TOP</a></header>;
 }
 
 export function Footer() {
