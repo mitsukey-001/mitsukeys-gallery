@@ -1,14 +1,14 @@
 const banners = [
   { href: '/games', no: '01', en: 'GAMES', title: 'ゲーム', copy: 'ゲームの紹介・購入・ブラウザプレイ', cls: 'portal-games', mark: '▲' },
   { href: '/art', no: '02', en: 'ARTWORKS', title: '絵', copy: 'イラスト・キャラクター・デザイン', cls: 'portal-art', mark: '●' },
-  { href: '', no: '03', en: 'COMICS', title: '漫画', copy: 'オリジナル漫画を準備しています', cls: 'portal-comic', mark: '□' },
+  { href: '/comics', no: '03', en: 'COMICS', title: '漫画', copy: 'オリジナル作品をウインドウで読む', cls: 'portal-comic', mark: '□' },
 ];
 
 export default function Home() {
   return <main className="portal">
     <header className="portal-header">
       <a className="mitsukii-logo" href="/"><b>石ノ神</b>みつきぃ<small>ISHINOGAMI MITSUKII</small></a>
-      <nav><a href="/games">GAME</a><a href="/art">ART</a></nav>
+      <nav><a href="/games">GAME</a><a href="/art">ART</a><a href="/comics">COMICS</a></nav>
       <a className="contact-pill" href="#about">ABOUT</a>
     </header>
     <section className="portal-hero">
