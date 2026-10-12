@@ -9,8 +9,8 @@ export default function ComicsPage() {
   return <main className="sub-page comic-library">
     <Header />
     <section className="sub-title comic-title">
-      <p>03 / COMICS</p>
-      <h1>描いた漫画を、<br/><em>読む。</em></h1>
+      <p>03/PROJECT</p>
+      <h1>プロジェクトを<br/><em>閲覧する。</em></h1>
       <span>タイトルまたはサムネイルを選ぶと、閲覧ウインドウが開きます。</span>
     </section>
     <section className="comic-shelf" aria-label="漫画作品一覧">
