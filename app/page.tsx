@@ -1,7 +1,7 @@
 const banners = [
   { href: '/games', no: '01', en: 'GAMES', title: 'ゲーム', copy: 'ゲームの紹介・購入・ブラウザプレイ', cls: 'portal-games', mark: '▲' },
   { href: '/art', no: '02', en: 'ARTWORKS', title: '絵', copy: 'イラスト・キャラクター・デザイン', cls: 'portal-art', mark: '●' },
-  { href: '/comics', no: '03', en: 'COMICS', title: '漫画', copy: 'オリジナル作品をウインドウで読む', cls: 'portal-comic', mark: '□' },
+  { href: '/comics', no: '03', en: 'COMICS', title: 'プロジェクト', copy: '考案したプロジェクト。', cls: 'portal-comic', mark: '□' },
 ];
 
 export default function Home() {
