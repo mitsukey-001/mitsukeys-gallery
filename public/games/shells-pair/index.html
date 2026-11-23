@@ -34,6 +34,8 @@
     }
 
     body.game-playing { overflow: hidden; }
+    #deckPile.draw-gesture-enabled { touch-action: none; cursor: grab; }
+    #deckPile.draw-gesture-enabled:active { cursor: grabbing; }
 
     button, select, input {
       font: inherit;
@@ -62,7 +64,8 @@
       box-shadow: 0 4px 0 rgba(100, 61, 6, .28);
     }
 
-    #drawBtn:not(:disabled) {
+    #drawBtn:not(:disabled),
+    #deckPile.draw-gesture-enabled .card.back {
       animation: drawButtonBlink .9s ease-in-out infinite;
     }
 
@@ -725,14 +728,13 @@
 
     .seat-card {
       width: 30px;
-      height: 42px;
+      height: auto;
+      aspect-ratio: 998 / 1391;
       flex: 0 0 auto;
       margin-left: -5px;
-      border: 3px solid #f2d28c;
+      border: 0;
       border-radius: 5px;
-      background:
-        linear-gradient(135deg, transparent 44%, rgba(255,255,255,.22) 45% 55%, transparent 56%),
-        repeating-linear-gradient(45deg, #174d87 0 5px, #0d3868 5px 10px);
+      background: url("shellspair_card_back.png") center / contain no-repeat;
       box-shadow: 0 4px 8px rgba(0,0,0,.18);
     }
 
@@ -811,6 +813,12 @@
     .pair-notice.discard-pair {
       background: linear-gradient(135deg, rgba(23, 77, 135, .96), rgba(17, 124, 105, .88));
       border-color: #cbeafe;
+    }
+
+    .pair-notice.event-use {
+      background: linear-gradient(135deg, rgba(7, 86, 157, .97), rgba(55, 136, 207, .92));
+      border-color: #bde8ff;
+      color: #f4fbff;
     }
 
     .pair-kind {
@@ -907,6 +915,21 @@
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+    }
+
+    #eventBtn {
+      min-width: 180px;
+      height: 40px;
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    #eventBtn.event-drop-ready {
+      opacity: 1;
+      border-color: #8ee9ff;
+      background: linear-gradient(180deg, #53c8ff, #147cc2);
+      box-shadow: 0 0 0 4px rgba(116, 222, 255, .55), 0 0 24px rgba(74, 205, 255, .9);
+      animation: pairButtonGlow .8s ease-in-out infinite;
     }
 
     .inline-claims {
@@ -1006,6 +1029,25 @@
       transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease, filter .16s ease;
     }
 
+    .card.image-face {
+      aspect-ratio: 998 / 1391;
+      height: auto !important;
+      min-height: 0 !important;
+      max-height: none !important;
+      padding: 0;
+      overflow: hidden;
+      border: 0;
+      background: transparent;
+    }
+
+    .card-face-image {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      pointer-events: none;
+    }
+
     .card.selected {
       outline: 4px solid #fff4a8;
       outline-offset: 2px;
@@ -1077,12 +1119,11 @@
       position: fixed;
       z-index: 125;
       width: 56px;
-      height: 78px;
-      border: 5px solid #f2d28c;
+      height: auto;
+      aspect-ratio: 998 / 1391;
+      border: 0;
       border-radius: 7px;
-      background:
-        linear-gradient(135deg, transparent 44%, rgba(255,255,255,.22) 45% 55%, transparent 56%),
-        repeating-linear-gradient(45deg, #174d87 0 8px, #0d3868 8px 16px);
+      background: url("shellspair_card_back.png") center / contain no-repeat;
       box-shadow: 0 12px 22px rgba(0, 0, 0, .34);
       pointer-events: none;
       transform-origin: center;
@@ -1165,21 +1206,36 @@
       border-color: #7446a8;
     }
 
+    .card.image-face,
+    .card.event.image-face,
+    .card.special.image-face,
+    .card.image-face.star-1,
+    .card.image-face.star-2,
+    .card.image-face.star-3,
+    .card.image-face.star-4,
+    .card.image-face.star-5 {
+      border: 0;
+      background: transparent;
+    }
+
+    .card.special.image-face::before { content: none; }
+
     .card.back {
       place-items: center;
       grid-template-rows: 1fr;
       color: #fff8e7;
-      background:
-        linear-gradient(135deg, transparent 44%, rgba(255,255,255,.22) 45% 55%, transparent 56%),
-        repeating-linear-gradient(45deg, #174d87 0 9px, #0d3868 9px 18px);
-      border: 8px solid #f2d28c;
+      aspect-ratio: 998 / 1391;
+      min-height: 0;
+      height: auto;
+      background: url("shellspair_card_back.png") center / contain no-repeat;
+      border: 0;
       cursor: default;
       text-align: center;
     }
 
     .card.back::after {
-      content: "Shells Pair";
-      display: grid;
+      content: none;
+      display: none;
       place-items: center;
       width: 74%;
       height: 74%;
@@ -1307,8 +1363,7 @@
 
     .deck-pile .card.back {
       width: 72px;
-      min-height: 100px;
-      border-width: 6px;
+      min-height: 0;
       box-shadow: 0 5px 0 rgba(4, 23, 40, .28), 0 12px 16px rgba(0,0,0,.22);
     }
 
@@ -1676,7 +1731,7 @@
       }
       .seat-card {
         width: 20px;
-        height: 28px;
+        height: auto;
         margin-left: -4px;
         border-width: 2px;
         border-radius: 4px;
@@ -1726,6 +1781,12 @@
         font-size: 11px;
         line-height: 1.15;
       }
+      .actions #eventBtn {
+        flex-basis: 100%;
+        min-width: 0;
+        height: 36px;
+        font-size: 12px;
+      }
       .hand-title { margin: 6px 0 5px; }
       .discard-wrap {
         width: min(300px, 100%);
@@ -1753,8 +1814,7 @@
       }
       .deck-pile .card.back {
         width: 52px;
-        min-height: 74px;
-        border-width: 5px;
+        min-height: 0;
       }
       .deck-count {
         min-width: 38px;
@@ -1986,9 +2046,9 @@
         <div class="actions">
           <button id="drawBtn">カードを引く</button>
           <button id="pairBtn">手札でペア</button>
-          <button id="eventBtn" class="secondary">イベント使用</button>
-          <button id="discardBtn" class="secondary">捨てる</button>
           <button id="skipDiscardPairBtn" class="secondary">ペアなしで続行</button>
+          <button id="discardBtn" class="secondary">捨てる</button>
+          <button id="eventBtn" class="secondary">イベント使用</button>
           <span id="discardClaimActions" class="inline-claims"></span>
         </div>
 
@@ -2074,35 +2134,36 @@
 
   <script>
     const NORMALS = [
-      { id: "bivalve", name: "2枚貝", icon: "◇", stars: 1, count: 6 },
-      { id: "spiral", name: "巻貝", icon: "◉", stars: 1, count: 6 },
-      { id: "copper", name: "銅貨", icon: "¢", stars: 2, count: 5 },
-      { id: "wheat", name: "麦", icon: "♧", stars: 2, count: 5 },
-      { id: "silver", name: "銀貨", icon: "◎", stars: 3, count: 4 },
-      { id: "pepper", name: "胡椒", icon: "✦", stars: 3, count: 4 },
-      { id: "gold", name: "金貨", icon: "●", stars: 4, count: 4 },
-      { id: "pearl", name: "真珠", icon: "○", stars: 4, count: 4 },
-      { id: "diamond", name: "ダイヤ", icon: "◆", stars: 5, count: 3 }
+      { id: "bivalve", name: "2枚貝", icon: "◇", stars: 1, count: 6, faceImage: "card-faces/shellspair_cards_Tr001.png" },
+      { id: "spiral", name: "巻貝", icon: "◉", stars: 1, count: 6, faceImage: "card-faces/shellspair_cards_Tre002.png" },
+      { id: "copper", name: "銅貨", icon: "¢", stars: 2, count: 5, faceImage: "card-faces/shellspair_cards_Tre006.png" },
+      { id: "wheat", name: "麦", icon: "♧", stars: 2, count: 5, faceImage: "card-faces/shellspair_cards_Tre005.png" },
+      { id: "silver", name: "銀貨", icon: "◎", stars: 3, count: 4, faceImage: "card-faces/shellspair_cards_Tre008.png" },
+      { id: "pepper", name: "胡椒", icon: "✦", stars: 3, count: 4, faceImage: "card-faces/shellspair_cards_Tre007.png" },
+      { id: "gold", name: "金貨", icon: "●", stars: 4, count: 4, faceImage: "card-faces/shellspair_cards_Tre010.png" },
+      { id: "pearl", name: "真珠", icon: "○", stars: 4, count: 4, faceImage: "card-faces/shellspair_cards_Tre011.png" },
+      { id: "diamond", name: "ダイヤ", icon: "◆", stars: 5, count: 3, faceImage: "card-faces/shellspair_cards_Tre012.png" }
     ];
 
     const SPECIALS = [
-      { id: "pearl_oyster", name: "真珠貝", icon: "◌", stars: 1, pairScore: 3, count: 4, pairsWith: ["pearl"], text: "真珠とペア" },
-      { id: "meat", name: "肉", icon: "▰", stars: 2, pairScore: 3, count: 3, pairsWith: ["pepper"], text: "胡椒とペア" },
-      { id: "treasure", name: "宝箱", icon: "▣", stars: 3, pairScore: 2, count: 2, pairsWith: ["bivalve", "spiral", "copper", "wheat", "pearl_oyster", "meat"], text: "星2以下とペア" }
+      { id: "pearl_oyster", name: "真珠貝", icon: "◌", stars: 1, pairScore: 3, count: 4, pairsWith: ["pearl"], text: "真珠とペア", faceImage: "card-faces/shellspair_cards_Tre003.png" },
+      { id: "meat", name: "肉", icon: "▰", stars: 2, pairScore: 3, count: 3, pairsWith: ["pepper"], text: "胡椒とペア", faceImage: "card-faces/shellspair_cards_Tre004.png" },
+      { id: "treasure", name: "宝箱", icon: "▣", stars: 3, pairScore: 2, count: 2, pairsWith: ["bivalve", "spiral", "copper", "wheat", "pearl_oyster", "meat"], text: "星2以下とペア", faceImage: "card-faces/shellspair_cards_Tre009.png" }
     ];
 
     const EVENTS = [
-      { id: "resurvey", name: "再探査", icon: "↻", text: "もう一度自分のターンを行う。", effect: "extraTurn" },
-      { id: "scrap", name: "破棄", icon: "×", text: "手札を1枚捨てる。そのカードはペア宣言できない。", effect: "silentDiscard" },
-      { id: "shell_mound", name: "貝塚", icon: "△", text: "手札を1枚捨てる。星1ならチップ2枚を獲得。ペア宣言不可。", effect: "shellMound" },
-      { id: "swap_meet", name: "交換会", icon: "⇆", text: "全員が手札を1枚選び左隣のプレイヤーに渡す。", effect: "passLeft" },
-      { id: "accident", name: "事故", icon: "!", text: "相手1人の手札を見ずに1枚捨てる。ペア宣言可。その後その相手は1枚引く。", effect: "accident" },
-      { id: "shark_trade", name: "鮫交換", icon: "⇄", text: "相手1人と、自分の1枚と相手の見ない1枚を交換する。", effect: "sharkTrade" }
+      { id: "resurvey", name: "再探査", icon: "↻", text: "もう一度自分のターンを行う。", effect: "extraTurn", faceImage: "card-faces/shellspair_cards_Acc004.png" },
+      { id: "scrap", name: "破棄", icon: "×", text: "手札を1枚捨てる。そのカードはペア宣言できない。", effect: "silentDiscard", faceImage: "card-faces/shellspair_cards_Acc003.png" },
+      { id: "shell_mound", name: "貝塚", icon: "△", text: "手札を1枚捨てる。星1ならチップ2枚を獲得。ペア宣言不可。", effect: "shellMound", faceImage: "card-faces/shellspair_cards_Acc005.png" },
+      { id: "swap_meet", name: "交換会", icon: "⇆", text: "全員が手札を1枚選び左隣のプレイヤーに渡す。", effect: "passLeft", faceImage: "card-faces/shellspair_cards_Acc006.png" },
+      { id: "accident", name: "事故", icon: "!", text: "相手1人の手札を見ずに1枚捨てる。ペア宣言可。その後その相手は1枚引く。", effect: "accident", faceImage: "card-faces/shellspair_cards_Acc001.png" },
+      { id: "shark_trade", name: "鮫交換", icon: "⇄", text: "相手1人と、自分の1枚と相手の見ない1枚を交換する。", effect: "sharkTrade", faceImage: "card-faces/shellspair_cards_Acc002.png" }
     ];
 
     let state;
     let tutorialAdvance = null;
     let handDrag = null;
+    let deckDrag = null;
     const $ = (id) => document.getElementById(id);
 
     function showSplashScreen() {
@@ -2597,6 +2658,19 @@
       }, 1800);
     }
 
+    function showEventUseNotice(player, event) {
+      state.pairNotice = {
+        type: "event",
+        playerName: player.name,
+        eventName: event.name,
+        eventIcon: event.icon,
+        eventText: event.text,
+        fading: false
+      };
+      renderPairNotice();
+      schedulePairNoticeFade();
+    }
+
     function queueCutinClear(duration = 900, after = null) {
       clearCutinTimer();
       state.cutinTimer = setTimeout(() => {
@@ -2694,6 +2768,124 @@
       return cards[0];
     }
 
+    function cpuLowestValueCard(cards) {
+      return [...cards].sort((a, b) => {
+        const aLinks = cards.filter(c => c.uid !== a.uid && canPair(a, c)).length;
+        const bLinks = cards.filter(c => c.uid !== b.uid && canPair(b, c)).length;
+        if (aLinks !== bLinks) return aLinks - bLinks;
+        return (a.stars || 0) - (b.stars || 0);
+      })[0] || null;
+    }
+
+    function chooseCpuEvent(player) {
+      const events = player.hand.filter(card => card.type === "event");
+      const normalCards = player.hand.filter(card => card.type !== "event");
+      const byEffect = effect => events.find(card => card.effect === effect);
+      const shellMound = byEffect("shellMound");
+      if (shellMound && normalCards.some(card => card.stars === 1)) return shellMound;
+      const scrap = byEffect("silentDiscard");
+      if (scrap) {
+        const target = cpuLowestValueCard(normalCards);
+        if (target && ((target.stars || 0) <= 3 || player.hand.length <= 2)) return scrap;
+      }
+      const resurvey = byEffect("extraTurn");
+      if (resurvey && state.deck.length) return resurvey;
+      const accident = byEffect("accident");
+      if (accident && state.players.some((p, i) => i !== state.current && !p.out && p.hand.length)) return accident;
+      const shark = byEffect("sharkTrade");
+      const give = cpuLowestValueCard(normalCards);
+      if (shark && give && ((give.stars || 0) <= 2 || player.hand.length <= 2)) return shark;
+      const swapMeet = byEffect("passLeft");
+      if (swapMeet && activePlayers().filter(p => p.hand.length).length >= 2) return swapMeet;
+      return null;
+    }
+
+    function cpuUseEvent(event) {
+      const player = currentPlayer();
+      animateCardToDiscard(event, state.current);
+      removeFromHand(player, event);
+      state.eventUsed = true;
+      state.discard.push(event);
+      state.selected = [];
+      state.log.unshift(`${player.name} がイベント「${event.name}」を使用。`);
+      showEventUseNotice(player, event);
+
+      if (event.effect === "extraTurn") {
+        state.log.unshift(`${player.name} は再探査でもう一度手番を行います。`);
+        checkGoingOut(player);
+        if (!state.gameOver && !player.out) startExtraTurn();
+        return;
+      }
+      if (event.effect === "silentDiscard" || event.effect === "shellMound") {
+        const candidates = player.hand.filter(card => card.type !== "event");
+        const card = event.effect === "shellMound"
+          ? candidates.filter(card => card.stars === 1)[0]
+          : cpuLowestValueCard(candidates);
+        if (!card) return nextTurn();
+        animateCardToDiscard(card, state.current);
+        removeFromHand(player, card);
+        state.discard.push(card);
+        playDiscardSound();
+        state.log.unshift(`${player.name} は「${card.name}」を破棄しました。ペア宣言はできません。`);
+        if (event.effect === "shellMound" && card.stars === 1) {
+          const paid = payChips(player, 2);
+          state.log.unshift(`${player.name} は貝塚でチップ${paid}枚を獲得。`);
+        }
+        checkGoingOut(player);
+        if (!state.gameOver) nextTurn();
+        return;
+      }
+      if (event.effect === "passLeft") {
+        const participants = state.players.map((p, i) => ({ p, i })).filter(({ p }) => !p.out && p.hand.length);
+        if (participants.length < 2) return nextTurn();
+        const picks = participants.map(({ p }) => cpuLowestValueCard(p.hand));
+        participants.forEach(({ i }, index) => animateCardBetweenPlayers(picks[index], i, participants[(index + 1) % participants.length].i));
+        participants.forEach(({ p }, index) => removeFromHand(p, picks[index]));
+        participants.forEach(({ p }, index) => participants[(index + 1) % participants.length].p.hand.push(picks[index]));
+        state.log.unshift("交換会で全員が不要度の高いカードを左隣へ渡しました。");
+        checkGoingOut(player);
+        if (!state.gameOver) nextTurn();
+        return;
+      }
+      if (event.effect === "accident") {
+        const targets = state.players.map((p, i) => ({ p, i })).filter(x => x.i !== state.current && !x.p.out && x.p.hand.length);
+        if (!targets.length) return nextTurn();
+        targets.sort((a, b) => b.p.hand.length - a.p.hand.length || b.p.chips - a.p.chips);
+        const targetIndex = targets[0].i;
+        const target = targets[0].p;
+        const discarded = target.hand.splice(Math.floor(Math.random() * target.hand.length), 1)[0];
+        animateCardToDiscard(discarded, targetIndex);
+        state.discard.push(discarded);
+        playDiscardSound();
+        state.pendingDiscard = { card: discarded, discarder: targetIndex, priorityFrom: state.current };
+        state.phase = "discardPair";
+        if (state.deck.length) target.hand.push(state.deck.pop());
+        state.log.unshift(`${player.name} は事故で ${target.name} の「${discarded.name}」を捨て札に置きました。`);
+        checkGoingOut(player);
+        render();
+        return;
+      }
+      if (event.effect === "sharkTrade") {
+        const targets = state.players.map((p, i) => ({ p, i })).filter(x => x.i !== state.current && !x.p.out && x.p.hand.length);
+        const give = cpuLowestValueCard(player.hand.filter(card => card.type !== "event"));
+        if (!targets.length || !give) return nextTurn();
+        targets.sort((a, b) => b.p.chips - a.p.chips || b.p.hand.length - a.p.hand.length);
+        const target = targets[0].p;
+        const take = target.hand[Math.floor(Math.random() * target.hand.length)];
+        animateCardBetweenPlayers(give, state.current, targets[0].i);
+        animateCardBetweenPlayers(take, targets[0].i, state.current);
+        removeFromHand(player, give);
+        removeFromHand(target, take);
+        player.hand.push(take);
+        target.hand.push(give);
+        state.log.unshift(`${player.name} は鮫交換で ${target.name} とカードを交換しました。`);
+        checkGoingOut(player);
+        if (!state.gameOver) nextTurn();
+        return;
+      }
+      nextTurn();
+    }
+
     function cpuStep() {
       if (state.gameOver || isHumanTurn()) return;
       const player = currentPlayer();
@@ -2716,6 +2908,11 @@
         if (pair) {
           claimPair(player, pair.a, pair.b, "手札");
           nextTurn();
+          return;
+        }
+        const event = chooseCpuEvent(player);
+        if (event) {
+          cpuUseEvent(event);
           return;
         }
         const discard = chooseDiscard(player);
@@ -2842,7 +3039,7 @@
       const ghost = document.createElement("div");
       ghost.className = "discard-fly-card";
       const width = Math.min(Math.max(from.width, 54), 118);
-      const height = width * 1.4;
+      const height = width * (card.faceImage ? 1391 / 998 : 142 / 104);
       ghost.style.left = `${from.left + from.width / 2 - width / 2}px`;
       ghost.style.top = `${from.top + from.height / 2 - height / 2}px`;
       ghost.style.width = `${width}px`;
@@ -2865,6 +3062,43 @@
       return animation;
     }
 
+    function playerCardAnimationAnchor(playerIndex, card = null) {
+      if (playerIndex === 0) {
+        return (card && document.querySelector(`#hand .card[data-uid="${card.uid}"]`)) || $("hand");
+      }
+      return document.querySelector(`.opponent-seat[data-player-index="${playerIndex}"] .seat-card:last-child`) ||
+        document.querySelector(`.opponent-seat[data-player-index="${playerIndex}"]`);
+    }
+
+    function animateCardBetweenPlayers(card, fromIndex, toIndex) {
+      const source = playerCardAnimationAnchor(fromIndex, card);
+      const target = playerCardAnimationAnchor(toIndex);
+      if (!source || !target) return null;
+      const from = source.getBoundingClientRect();
+      const to = target.getBoundingClientRect();
+      if (!from.width || !from.height || !to.width || !to.height) return null;
+      const ghost = document.createElement("div");
+      ghost.className = "discard-fly-card";
+      const width = Math.min(Math.max(from.width, 48), 92);
+      const height = width * (fromIndex === 0 && !card.faceImage ? 142 / 104 : 1391 / 998);
+      ghost.style.left = `${from.left + from.width / 2 - width / 2}px`;
+      ghost.style.top = `${from.top + from.height / 2 - height / 2}px`;
+      ghost.style.width = `${width}px`;
+      ghost.style.height = `${height}px`;
+      ghost.innerHTML = fromIndex === 0 ? cardHtml(card).replace(" data-uid=", " data-transfer=") : cardBackHtml();
+      document.body.appendChild(ghost);
+      const dx = to.left + to.width / 2 - (from.left + from.width / 2);
+      const dy = to.top + to.height / 2 - (from.top + from.height / 2);
+      const animation = ghost.animate([
+        { transform: "translate(0, 0) scale(1) rotate(-4deg)", opacity: 1 },
+        { transform: `translate(${dx * .5}px, ${dy * .45 - 30}px) scale(.95) rotate(8deg)`, opacity: 1, offset: .5 },
+        { transform: `translate(${dx}px, ${dy}px) scale(.72) rotate(-3deg)`, opacity: .9 }
+      ], { duration: 560, easing: "cubic-bezier(.2,.8,.25,1)", fill: "forwards" });
+      animation.onfinish = () => ghost.remove();
+      animation.oncancel = () => ghost.remove();
+      return animation;
+    }
+
     function animateDeckToHand(playerIndex = state.current) {
       const source = document.querySelector("#deckPile .card.back");
       const target = playerIndex === 0
@@ -2878,7 +3112,7 @@
       const ghost = document.createElement("div");
       ghost.className = "discard-fly-card";
       const width = Math.min(Math.max(from.width, 54), 104);
-      const height = width * 1.4;
+      const height = width * (1391 / 998);
       ghost.style.left = `${from.left + from.width / 2 - width / 2}px`;
       ghost.style.top = `${from.top + from.height / 2 - height / 2}px`;
       ghost.style.width = `${width}px`;
@@ -2894,6 +3128,41 @@
       ], { duration: playerIndex === 0 ? 520 : 600, easing: "cubic-bezier(.2, .85, .25, 1)", fill: "forwards" });
       animation.onfinish = () => ghost.remove();
       animation.oncancel = () => ghost.remove();
+    }
+
+    function startDeckDrag(event) {
+      if ($("drawBtn").disabled || (event.pointerType === "mouse" && event.button !== 0)) return;
+      deckDrag = { pointerId: event.pointerId, x: event.clientX, y: event.clientY, ghost: null };
+      $("deckPile").setPointerCapture?.(event.pointerId);
+    }
+
+    function moveDeckDrag(event) {
+      if (!deckDrag || deckDrag.pointerId !== event.pointerId) return;
+      if (Math.hypot(event.clientX - deckDrag.x, event.clientY - deckDrag.y) < 8 && !deckDrag.ghost) return;
+      event.preventDefault();
+      if (!deckDrag.ghost) {
+        const ghost = document.createElement("div");
+        ghost.className = "discard-fly-card";
+        ghost.style.width = "72px";
+        ghost.style.height = `${72 * (1391 / 998)}px`;
+        ghost.innerHTML = cardBackHtml();
+        document.body.appendChild(ghost);
+        deckDrag.ghost = ghost;
+      }
+      deckDrag.ghost.style.left = `${event.clientX - 36}px`;
+      deckDrag.ghost.style.top = `${event.clientY - 50}px`;
+    }
+
+    function finishDeckDrag(event) {
+      if (!deckDrag || deckDrag.pointerId !== event.pointerId) return;
+      const drag = deckDrag;
+      deckDrag = null;
+      drag.ghost?.remove();
+      $("deckPile").releasePointerCapture?.(event.pointerId);
+      if (event.type !== "pointercancel" && !$('drawBtn').disabled && Math.hypot(event.clientX - drag.x, event.clientY - drag.y) >= 40) {
+        event.preventDefault();
+        requestDrawCard();
+      }
     }
 
     function canDragDiscardCard(displayIndex, card = null) {
@@ -2928,6 +3197,7 @@
       handDrag.ghost = ghost;
       el.style.opacity = ".35";
       $("discardArea").closest(".discard-wrap")?.classList.add("drop-ready");
+      if (card.type === "event") $("eventBtn").classList.add("event-drop-ready");
     }
 
     function moveHandCardDrag(event) {
@@ -2949,20 +3219,38 @@
       return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
     }
 
+    function isPointInEventZone(x, y) {
+      const zone = $("eventBtn");
+      if (!zone) return false;
+      const rect = zone.getBoundingClientRect();
+      return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+    }
+
     function finishHandCardDrag(event) {
       if (!handDrag || handDrag.pointerId !== event.pointerId) return;
       const drag = handDrag;
       handDrag = null;
       drag.source?.releasePointerCapture?.(event.pointerId);
       document.querySelector(".discard-wrap")?.classList.remove("drop-ready");
+      $("eventBtn").classList.remove("event-drop-ready");
       if (drag.source) drag.source.style.opacity = "";
       if (!drag.dragging) return;
       event.preventDefault();
       if (drag.source) drag.source.dataset.suppressClick = "1";
+      const eventDrop = drag.card.type === "event" && isPointInEventZone(event.clientX, event.clientY);
       const swipeUp = event.clientY - drag.startY < -45 && Math.hypot(event.clientX - drag.startX, event.clientY - drag.startY) > 70;
       const dropped = isPointInDiscardZone(event.clientX, event.clientY) || swipeUp;
-      if (dropped && state.phase === "afterDraw") {
-        settleDraggedDiscardGhost(drag.ghost, () => discardCardDirect(drag.card, { skipAnimation: true }));
+      if (eventDrop && state.phase === "afterDraw") {
+        drag.ghost?.remove();
+        state.selected = [drag.card.uid];
+        useEvent();
+      } else if (dropped && state.phase === "afterDraw") {
+        if (drag.card.type === "event") {
+          drag.ghost?.remove();
+          confirmDraggedEvent(drag.card);
+        } else {
+          settleDraggedDiscardGhost(drag.ghost, () => discardCardDirect(drag.card, { skipAnimation: true }));
+        }
       } else {
         drag.ghost?.remove();
       }
@@ -2991,6 +3279,21 @@
         ghost.remove();
         if (after) after();
       };
+    }
+
+    function confirmDraggedEvent(card) {
+      showModal("イベントカードを使用しますか？", `<p><strong>${card.name}</strong></p><p>${card.text}</p>`, [
+        { label: "使用する", action: () => {
+          closeModal({ stayOnCurrentScreen: true });
+          state.selected = [card.uid];
+          useEvent();
+        } },
+        { label: "使用せず捨てる", className: "secondary", action: () => {
+          closeModal({ stayOnCurrentScreen: true });
+          discardCardDirect(card);
+        } },
+        { label: "キャンセル", className: "secondary", action: () => closeModal({ stayOnCurrentScreen: true }) }
+      ]);
     }
 
     function requestDrawCard() {
@@ -3214,9 +3517,11 @@
       }
       const player = currentPlayer();
       const event = cards[0];
+      animateCardToDiscard(event, state.current);
       removeFromHand(player, event);
       state.eventUsed = true;
       state.log.unshift(`${player.name} がイベント「${event.name}」を使用。`);
+      showEventUseNotice(player, event);
       const result = applyEvent(event);
       state.discard.push(event);
       state.selected = [];
@@ -3330,6 +3635,10 @@
               picks.set(p, p.hand[Math.floor(Math.random() * p.hand.length)]);
             }
           });
+          participants.forEach(({ p, i }, index) => {
+            const to = participants[(index + 1) % participants.length];
+            animateCardBetweenPlayers(picks.get(p), i, to.i);
+          });
           participants.forEach(({ p }) => removeFromHand(p, picks.get(p)));
           participants.forEach(({ p }, index) => {
             const to = participants[(index + 1) % participants.length].p;
@@ -3382,6 +3691,8 @@
             cardEl.addEventListener("click", () => {
               const give = player.hand.find(c => c.uid === cardEl.dataset.sharkCard);
               const take = target.hand[Math.floor(Math.random() * target.hand.length)];
+              animateCardBetweenPlayers(give, state.current, targetIndex);
+              animateCardBetweenPlayers(take, targetIndex, state.current);
               removeFromHand(player, give);
               removeFromHand(target, take);
               player.hand.push(take);
@@ -3469,6 +3780,17 @@
       if (!notice) {
         $("pairNotice").className = "pair-notice";
         $("pairNotice").innerHTML = "";
+        return;
+      }
+      if (notice.type === "event") {
+        $("pairNotice").className = `pair-notice ${notice.fading ? "fading" : "show"} event-use`;
+        $("pairNotice").innerHTML = `
+          <div class="pair-main">
+            ${notice.playerName} がイベント使用
+            <span class="pair-cards">${notice.eventIcon} ${notice.eventName} / ${notice.eventText}</span>
+          </div>
+          <div class="pair-kind">イベント</div>
+        `;
         return;
       }
       const sourceClass = notice.source === "捨て札" ? "discard-pair" : "hand-pair";
@@ -3599,14 +3921,19 @@
     }
 
     function cardHtml(card, pairReady = false) {
-      return `
-        <div class="card ${card.type} star-${card.stars || 0} ${state.selected.includes(card.uid) ? "selected" : ""} ${pairReady ? "pair-ready" : ""}" data-uid="${card.uid}" role="button" aria-pressed="${state.selected.includes(card.uid)}" tabindex="0">
+      const selected = state.selected.includes(card.uid);
+      const imageFace = card.faceImage
+        ? `<img class="card-face-image" src="${card.faceImage}" alt="${card.name}">`
+        : `
           <div class="stars"><span>${cardStars(card)}</span><span>${cardTypeLabel(card)}</span></div>
           <div class="card-face">
             <div class="icon">${card.icon}</div>
             <div class="card-name">${card.name}</div>
           </div>
-          <div class="card-text">${card.type === "event" ? card.text : card.type === "special" ? card.text : `通常ペア ${card.stars}枚`}</div>
+          <div class="card-text">${card.type === "event" ? card.text : card.type === "special" ? card.text : `通常ペア ${card.stars}枚`}</div>`;
+      return `
+        <div class="card ${card.type} star-${card.stars || 0} ${card.faceImage ? "image-face" : ""} ${selected ? "selected" : ""} ${pairReady ? "pair-ready" : ""}" data-uid="${card.uid}" role="button" aria-label="${card.name}" aria-pressed="${selected}" tabindex="0">
+          ${imageFace}
         </div>
       `;
     }
@@ -3734,6 +4061,7 @@
         $("skipDiscardPairBtn").disabled = !(step === "noPair" && state.phase === "discardPair");
       }
       renderTutorialGuidance();
+      $("deckPile").classList.toggle("draw-gesture-enabled", !$("drawBtn").disabled);
     }
 
     function confirmQuitGame() {
@@ -3919,6 +4247,10 @@
     $("skipTutorial").addEventListener("click", skipTutorial);
     $("tutorialOverlay").addEventListener("click", advanceTutorialMessage);
     $("drawBtn").addEventListener("click", requestDrawCard);
+    $("deckPile").addEventListener("pointerdown", startDeckDrag);
+    $("deckPile").addEventListener("pointermove", moveDeckDrag);
+    $("deckPile").addEventListener("pointerup", finishDeckDrag);
+    $("deckPile").addEventListener("pointercancel", finishDeckDrag);
     $("pairBtn").addEventListener("click", declareHandPair);
     $("eventBtn").addEventListener("click", useEvent);
     $("discardBtn").addEventListener("click", discardSelected);
@@ -3938,4 +4270,3 @@
   </script>
 </body>
 </html>
-
